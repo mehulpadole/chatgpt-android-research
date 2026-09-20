@@ -1,0 +1,346 @@
+2:<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="37" android:compileSdkVersionCodename="17" android:requiredSplitTypes="base__abi,base__density" android:splitTypes="" package="com.openai.chatgpt" platformBuildVersionCode="37" platformBuildVersionName="17">
+5:            <action android:name="android.support.customtabs.action.CustomTabsService"/>
+8:            <action android:name="android.settings.VIEW_ADVANCED_POWER_USAGE_DETAIL"/>
+12:            <action android:name="android.intent.action.SENDTO"/>
+16:            <action android:name="android.intent.action.SEND"/>
+20:            <action android:name="android.intent.action.SEND"/>
+24:            <action android:name="com.whatsapp.intent.action.ENABLE_STICKER_PACK"/>
+26:        <package android:name="com.google.android.gm"/>
+27:        <package android:name="com.google.android.gm.lite"/>
+28:        <package android:name="com.microsoft.office.outlook"/>
+29:        <package android:name="com.google.android.apps.messaging"/>
+30:        <package android:name="com.samsung.android.messaging"/>
+31:        <package android:name="com.android.mms"/>
+32:        <package android:name="com.instagram.android"/>
+33:        <package android:name="com.instagram.lite"/>
+34:        <package android:name="com.facebook.orca"/>
+35:        <package android:name="com.facebook.mlite"/>
+36:        <package android:name="com.facebook.katana"/>
+37:        <package android:name="com.whatsapp"/>
+38:        <package android:name="com.whatsapp.w4b"/>
+39:        <package android:name="org.telegram.messenger"/>
+40:        <package android:name="org.thunderdog.challegram"/>
+41:        <package android:name="org.thoughtcrime.securesms"/>
+42:        <package android:name="com.kakao.talk"/>
+43:        <package android:name="jp.naver.line.android"/>
+44:        <package android:name="com.snapchat.android"/>
+45:        <package android:name="com.samsung.android.email.provider"/>
+46:        <package android:name="com.yahoo.mobile.client.android.mail"/>
+47:        <package android:name="com.zhiliaoapp.musically"/>
+48:        <package android:name="com.ss.android.ugc.trill"/>
+49:        <package android:name="com.twitter.android"/>
+51:            <action android:name="android.intent.action.VIEW"/>
+52:            <category android:name="android.intent.category.BROWSABLE"/>
+55:        <package android:name="com.android.vending"/>
+56:        <package android:name="com.google.android.gms"/>
+58:            <action android:name="android.intent.action.PROCESS_TEXT"/>
+62:            <action android:name="android.intent.action.DIAL"/>
+66:            <action android:name="android.intent.action.SENDTO"/>
+70:            <action android:name="android.intent.action.VIEW"/>
+71:            <category android:name="android.intent.category.BROWSABLE"/>
+74:            <action android:name="android.intent.action.VIEW"/>
+77:            <action android:name="android.intent.action.VIEW"/>
+80:        <package android:name="com.heytap.market"/>
+81:        <package android:name="com.oppo.market"/>
+82:        <provider android:authorities="com.heytap.market.ExpTrackProvider"/>
+83:        <provider android:authorities="com.vivo.attribution.provider"/>
+84:        <package android:name="com.android.chrome"/>
+86:            <action android:name="com.android.vending.billing.InAppBillingService.BIND"/>
+89:            <action android:name="com.google.android.apps.play.billingtestcompanion.BillingOverrideService.BIND"/>
+91:        <package android:name="com.google.android.apps.maps"/>
+93:    <uses-permission android:name="android.permission.INTERNET"/>
+94:    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+95:    <uses-permission android:minSdkVersion="33" android:name="android.permission.POST_NOTIFICATIONS"/>
+96:    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+97:    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+98:    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS"/>
+99:    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
+100:    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+101:    <uses-permission android:name="android.permission.CAMERA"/>
+102:    <uses-feature android:name="android.hardware.camera.any" android:required="false"/>
+103:    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+104:    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+105:    <uses-feature android:name="android.hardware.camera.flash" android:required="false"/>
+106:    <uses-permission android:name="android.permission.DETECT_SCREEN_CAPTURE"/>
+107:    <uses-permission android:name="android.permission.VIBRATE"/>
+108:    <uses-permission android:maxSdkVersion="36" android:name="android.permission.READ_CONTACTS"/>
+109:    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+110:    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+111:    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
+112:    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+113:    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+114:    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+115:    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+116:    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
+117:    <uses-feature android:name="android.hardware.screen.portrait" android:required="false"/>
+118:    <uses-feature android:name="android.hardware.screen.landscape" android:required="false"/>
+119:    <uses-permission android:name="android.permission.NFC"/>
+120:    <uses-permission android:name="android.permission.READ_BASIC_PHONE_STATE"/>
+121:    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+122:    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+123:    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+124:    <uses-feature android:glEsVersion="0x30000" android:required="true"/>
+125:    <uses-permission android:name="com.android.vending.BILLING"/>
+126:    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+127:    <permission android:name="com.openai.chatgpt.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="signature"/>
+128:    <uses-permission android:name="com.openai.chatgpt.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+129:    <uses-permission android:maxSdkVersion="30" android:name="android.permission.BLUETOOTH"/>
+130:    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+131:    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"/>
+132:    <application android:allowBackup="false" android:appComponentFactory="papa.PerfAppComponentFactory" android:dataExtractionRules="@xml/data_extraction_rules" android:extractNativeLibs="false" android:fullBackupContent="@xml/backup_rules" android:icon="@mipmap/ic_launcher" android:label="@string/ab" android:largeHeap="@bool/large_heap_enabled" android:localeConfig="@xml/_generated_res_locale_config" android:name="com.openai.chatgpt.app.MainApplication" android:resizeableActivity="true" android:supportsRtl="true" android:theme="@style/Theme.App">
+133:        <meta-data android:name="asset_statements" android:resource="@string/APKTOOL_RENAMED_0x7f1408c0"/>
+134:        <service android:enabled="false" android:exported="false" android:name="androidx.appcompat.app.AppLocalesMetadataHolderService">
+135:            <meta-data android:name="autoStoreLocales" android:value="true"/>
+137:        <activity android:allowEmbedded="true" android:exported="true" android:launchMode="singleTop" android:name="com.openai.chatgpt.MainActivity" android:theme="@style/Theme.App.Starting" android:windowSoftInputMode="adjustResize">
+138:            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts"/>
+140:                <action android:name="android.intent.action.MAIN"/>
+141:                <category android:name="android.intent.category.LAUNCHER"/>
+144:                <action android:name="android.intent.action.SEND"/>
+145:                <category android:name="android.intent.category.DEFAULT"/>
+151:                <action android:name="android.intent.action.SEND_MULTIPLE"/>
+152:                <category android:name="android.intent.category.DEFAULT"/>
+158:        <activity-alias android:exported="true" android:label="@string/ab" android:name="com.openai.chatgpt.ImageEditActivity" android:targetActivity="com.openai.chatgpt.MainActivity">
+160:                <action android:name="android.intent.action.EDIT"/>
+161:                <category android:name="android.intent.category.DEFAULT"/>
+165:                <action android:name="android.intent.action.EDIT"/>
+166:                <category android:name="android.intent.category.DEFAULT"/>
+170:        <activity-alias android:exported="true" android:label="@string/ab" android:name="com.openai.chatgpt.FilePreviewActivity" android:targetActivity="com.openai.chatgpt.MainActivity">
+172:                <action android:name="android.intent.action.VIEW"/>
+173:                <category android:name="android.intent.category.DEFAULT"/>
+188:                <action android:name="android.intent.action.VIEW"/>
+189:                <category android:name="android.intent.category.DEFAULT"/>
+204:        <activity-alias android:exported="true" android:label="@string/APKTOOL_RENAMED_0x7f1417b4" android:name="com.openai.chatgpt.TextProcessorActivity" android:targetActivity="com.openai.chatgpt.MainActivity">
+206:                <action android:name="android.intent.action.PROCESS_TEXT"/>
+207:                <category android:name="android.intent.category.DEFAULT"/>
+211:        <activity android:excludeFromRecents="true" android:exported="true" android:name="com.openai.chatgpt.ChatGptDeeplinkActivity" android:noHistory="true" android:taskAffinity="" android:theme="@android:style/Theme.NoDisplay">
+213:                <action android:name="android.intent.action.VIEW"/>
+214:                <category android:name="android.intent.category.DEFAULT"/>
+215:                <category android:name="android.intent.category.BROWSABLE"/>
+223:                <action android:name="android.intent.action.VIEW"/>
+224:                <category android:name="android.intent.category.DEFAULT"/>
+225:                <category android:name="android.intent.category.BROWSABLE"/>
+229:                <action android:name="android.intent.action.VIEW"/>
+230:                <category android:name="android.intent.category.DEFAULT"/>
+231:                <category android:name="android.intent.category.BROWSABLE"/>
+240:                <action android:name="android.intent.action.VIEW"/>
+241:                <category android:name="android.intent.category.DEFAULT"/>
+242:                <category android:name="android.intent.category.BROWSABLE"/>
+251:                <action android:name="android.intent.action.VIEW"/>
+252:                <category android:name="android.intent.category.DEFAULT"/>
+253:                <category android:name="android.intent.category.BROWSABLE"/>
+259:                <action android:name="android.intent.action.VIEW"/>
+260:                <category android:name="android.intent.category.DEFAULT"/>
+261:                <category android:name="android.intent.category.BROWSABLE"/>
+267:                <action android:name="android.intent.action.VIEW"/>
+268:                <category android:name="android.intent.category.DEFAULT"/>
+269:                <category android:name="android.intent.category.BROWSABLE"/>
+275:                <action android:name="android.intent.action.VIEW"/>
+276:                <category android:name="android.intent.category.DEFAULT"/>
+277:                <category android:name="android.intent.category.BROWSABLE"/>
+283:                <action android:name="android.intent.action.VIEW"/>
+284:                <category android:name="android.intent.category.DEFAULT"/>
+285:                <category android:name="android.intent.category.BROWSABLE"/>
+350:                <action android:name="android.intent.action.VIEW"/>
+351:                <category android:name="android.intent.category.DEFAULT"/>
+352:                <category android:name="android.intent.category.BROWSABLE"/>
+364:                <action android:name="android.intent.action.VIEW"/>
+365:                <category android:name="android.intent.category.DEFAULT"/>
+366:                <category android:name="android.intent.category.BROWSABLE"/>
+370:        <activity android:enabled="@bool/assistant_enabled" android:excludeFromRecents="true" android:exported="true" android:name="com.openai.feature.assistant.impl.AssistantProxyActivity" android:noHistory="true" android:taskAffinity="" android:theme="@android:style/Theme.NoDisplay">
+372:                <action android:name="android.intent.action.ASSIST"/>
+373:                <category android:name="android.intent.category.DEFAULT"/>
+376:        <service android:enabled="@bool/assistant_enabled" android:exported="true" android:label="@string/ab" android:name="com.openai.feature.assistant.impl.AssistantVoiceInteractionService" android:permission="android.permission.BIND_VOICE_INTERACTION">
+377:            <meta-data android:name="android.voice_interaction" android:resource="@xml/assistant_interaction_service"/>
+379:                <action android:name="android.service.voice.VoiceInteractionService"/>
+382:        <service android:enabled="@bool/assistant_enabled" android:label="@string/ab" android:name="com.openai.feature.assistant.impl.AssistantVoiceInteractionSessionService" android:permission="android.permission.BIND_VOICE_INTERACTION"/>
+383:        <meta-data android:name="android.content.APP_RESTRICTIONS" android:resource="@xml/app_restrictions"/>
+384:        <meta-data android:name="android.credentials.DYNAMIC_ASSET_LINKS" android:resource="@string/APKTOOL_RENAMED_0x7f1408c0"/>
+385:        <receiver android:exported="false" android:name="com.openai.apps.appbase.app.managedconfig.ManagedConfigurationsChangedReceiver">
+387:                <action android:name="android.intent.action.APPLICATION_RESTRICTIONS_CHANGED"/>
+390:        <provider android:authorities="com.openai.chatgpt.firebaseinitprovider" android:directBootAware="true" android:exported="false" android:initOrder="100" android:name="com.openai.apps.appbase.app.startup.FirebaseInitProvider"/>
+391:        <service android:exported="false" android:name="com.openai.feature.conversations.impl.coordinator.ConversationStreamingService"/>
+392:        <service android:exported="false" android:foregroundServiceType="dataSync" android:name="com.openai.feature.conversations.impl.notifications.WorkReasoningNotificationForegroundService"/>
+393:        <service android:exported="true" android:icon="@drawable/design_logo_assistant" android:label="@string/ab" android:name="com.openai.feature.voice.impl.quicktile.QuickTileService" android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+395:                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+398:        <receiver android:exported="false" android:name="com.openai.feature.calpico.impl.notification.CalpicoNotificationBroadcastReceiver"/>
+399:        <activity android:allowEmbedded="true" android:excludeFromRecents="true" android:exported="false" android:name="com.openai.feature.codexremote.impl.CodexRemoteBubbleActivity" android:resizeableActivity="true" android:taskAffinity="" android:theme="@style/Theme.App" android:windowSoftInputMode="adjustResize"/>
+400:        <service android:exported="false" android:foregroundServiceType="dataSync" android:name="com.openai.feature.codexremote.impl.data.CodexRemoteSessionForegroundService"/>
+401:        <service android:exported="false" android:foregroundServiceType="microphone" android:name="com.openai.feature.codexremote.impl.voice.CodexVoiceForegroundService"/>
+402:        <meta-data android:name="com.google.android.gms.wallet.api.enabled" android:value="true"/>
+403:        <activity android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" android:excludeFromRecents="true" android:exported="false" android:name="com.openai.feature.conversations.screencontext.ConversationScreenShareSettingsGuideActivity" android:resizeableActivity="true" android:supportsPictureInPicture="true" android:taskAffinity=""/>
+404:        <service android:exported="true" android:label="@string/APKTOOL_RENAMED_0x7f14079e" android:name="com.openai.feature.conversations.screencontext.ConversationScreenAccessibilityService" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+406:                <action android:name="android.accessibilityservice.AccessibilityService"/>
+408:            <meta-data android:name="android.accessibilityservice" android:resource="@xml/conversation_screen_accessibility_service"/>
+410:        <activity android:excludeFromRecents="true" android:exported="true" android:name="com.openai.voice.assistant.AssistantActivity" android:noHistory="true" android:theme="@style/Theme.VoiceAssistant"/>
+411:        <provider android:authorities="com.openai.chatgpt.stickers" android:enabled="true" android:exported="true" android:name="com.openai.feature.imagedetail.impl.whatsapp.WhatsAppStickerContentProvider" android:readPermission="com.whatsapp.sticker.READ"/>
+412:        <activity android:excludeFromRecents="true" android:exported="false" android:name="com.openai.feature.sites.impl.SitesShareActivity" android:theme="@style/Theme.App.SitesShare" android:windowSoftInputMode="adjustResize"/>
+413:        <receiver android:exported="false" android:name="com.openai.feature.shortcut.impl.PinnedShortcutReceiver"/>
+414:        <provider android:authorities="com.openai.chatgpt.files" android:exported="false" android:grantUriPermissions="true" android:name="com.openai.files.ChatFileProvider">
+415:            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths"/>
+417:        <activity android:excludeFromRecents="true" android:exported="true" android:launchMode="singleTask" android:name="com.openai.feature.onboarding.impl.otp.OtpDeepLinkActivity" android:theme="@android:style/Theme.NoDisplay">
+419:                <action android:name="android.intent.action.VIEW"/>
+420:                <category android:name="android.intent.category.DEFAULT"/>
+421:                <category android:name="android.intent.category.BROWSABLE"/>
+427:        <activity android:excludeFromRecents="true" android:exported="true" android:launchMode="singleTask" android:name="com.openai.feature.onboarding.impl.next.deeplink.ContinueRegistrationActivity" android:theme="@style/Theme.Onboarding.Trampoline">
+429:                <action android:name="android.intent.action.VIEW"/>
+430:                <category android:name="android.intent.category.DEFAULT"/>
+431:                <category android:name="android.intent.category.BROWSABLE"/>
+437:        <receiver android:exported="false" android:name="com.openai.feature.notification.ConversationBubbleDeletedReceiver"/>
+438:        <receiver android:exported="false" android:name="com.openai.feature.notification.impl.NotificationBroadcastReceiver"/>
+439:        <receiver android:enabled="false" android:exported="false" android:name="com.openai.feature.notification.impl.AppUpdateReceiver">
+441:                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+444:        <service android:exported="false" android:name="com.openai.feature.notification.impl.NotificationService">
+446:                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+449:        <service android:exported="false" android:foregroundServiceType="mediaProjection|microphone" android:name="com.openai.voice.webrtc.VoiceModeForegroundService"/>
+450:        <receiver android:exported="true" android:name="com.openai.feature.widget.WidgetReceiver">
+452:                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+454:            <meta-data android:name="android.appwidget.provider" android:resource="@xml/chatgpt_widget_info"/>
+456:        <receiver android:exported="true" android:name="com.openai.feature.widget.WidgetInstallBroadcastReceiver"/>
+457:        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize" android:exported="false" android:launchMode="singleTask" android:name="com.openai.feature.auth.impl.web.WebAuthenticationActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+458:        <activity android:exported="true" android:name="com.openai.feature.auth.impl.web.WebRedirectActivity">
+460:                <action android:name="android.intent.action.VIEW"/>
+461:                <category android:name="android.intent.category.DEFAULT"/>
+462:                <category android:name="android.intent.category.BROWSABLE"/>
+471:        <meta-data android:name="com.google.mlkit.vision.DEPENDENCIES" android:value="ocr,face,barcode"/>
+472:        <provider android:authorities="com.openai.chatgpt.glyphs" android:exported="false" android:grantUriPermissions="true" android:name="com.openai.draw.GlyphsFileProvider">
+473:            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths"/>
+475:        <meta-data android:name="io.sentry.auto-init" android:value="false"/>
+476:        <activity android:exported="false" android:name="com.withpersona.sdk2.inquiry.internal.InquiryActivity" android:screenOrientation="portrait" android:theme="@style/Persona.Inquiry.Theme" android:windowSoftInputMode="adjustResize"/>
+477:        <service android:enabled="false" android:exported="false" android:name="androidx.camera.core.impl.MetadataHolderService">
+478:            <meta-data android:name="androidx.camera.core.impl.MetadataHolderService.DEFAULT_CONFIG_PROVIDER" android:value="androidx.camera.camera2.Camera2Config$DefaultProvider"/>
+480:        <activity android:exported="false" android:label="@string/e78" android:name="com.google.android.libraries.places.widget.AutocompleteActivity" android:theme="@style/PlacesAutocompleteOverlay" android:windowSoftInputMode="adjustResize"/>
+481:        <activity android:exported="false" android:name="com.google.android.libraries.places.widget.BasicPlaceAutocompleteActivity" android:windowSoftInputMode="adjustResize"/>
+482:        <activity android:exported="false" android:name="com.google.android.libraries.places.widget.PlaceAutocompleteActivity" android:windowSoftInputMode="adjustResize"/>
+483:        <activity android:exported="false" android:name="com.google.android.libraries.places.widget.internal.placedetails.photoviewer.PlacesLightboxActivity" android:windowSoftInputMode="adjustResize"/>
+484:        <provider android:authorities="com.openai.chatgpt.com.plaid.link.internal.PlaidFileProvider" android:exported="false" android:grantUriPermissions="true" android:name="com.plaid.link.internal.PlaidFileProvider">
+485:            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/plaid_file_paths"/>
+487:        <activity android:autoRemoveFromRecents="true" android:exported="true" android:name="com.plaid.internal.LinkRedirectActivity" android:theme="@style/Theme.MaterialComponents.NoActionBar">
+489:                <action android:name="android.intent.action.VIEW"/>
+490:                <category android:name="android.intent.category.DEFAULT"/>
+491:                <category android:name="android.intent.category.BROWSABLE"/>
+498:        <activity android:exported="false" android:launchMode="singleInstance" android:name="com.plaid.internal.link.LinkActivity" android:theme="@style/PlaidTransparentTheme" android:windowSoftInputMode="adjustPan"/>
+499:        <activity android:exported="false" android:name="com.stripe.android.paymentsheet.PaymentSheetActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+500:        <activity android:exported="false" android:name="com.stripe.android.paymentsheet.PaymentOptionsActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+501:        <activity android:exported="false" android:name="com.stripe.android.customersheet.CustomerSheetActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+502:        <activity android:exported="false" android:name="com.stripe.android.paymentsheet.addresselement.AddressElementActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+503:        <activity android:exported="false" android:name="com.stripe.android.paymentsheet.addresselement.AutocompleteActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+504:        <activity android:exported="false" android:name="com.stripe.android.paymentsheet.paymentdatacollection.bacs.BacsMandateConfirmationActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+505:        <activity android:exported="false" android:name="com.stripe.android.paymentsheet.paymentdatacollection.polling.PollingActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+506:        <activity android:exported="false" android:name="com.stripe.android.paymentsheet.ui.SepaMandateActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+507:        <activity android:exported="false" android:name="com.stripe.android.paymentsheet.ExternalPaymentMethodProxyActivity" android:theme="@style/StripePayLauncherDefaultTheme"/>
+508:        <activity android:exported="false" android:name="com.stripe.android.paymentelement.confirmation.cpms.CustomPaymentMethodProxyActivity" android:theme="@style/StripePayLauncherDefaultTheme"/>
+509:        <activity android:name="com.stripe.android.paymentsheet.paymentdatacollection.cvcrecollection.CvcRecollectionActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+510:        <activity android:name="com.stripe.android.paymentelement.embedded.sheet.EmbeddedSheetActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+511:        <activity android:name="com.stripe.android.common.nfcscan.NfcScanningActivity" android:theme="@style/StripePaymentSheetTapToAddTheme"/>
+512:        <activity android:name="com.stripe.android.common.taptoadd.TapToAddActivity" android:theme="@style/StripePaymentSheetTapToAddTheme"/>
+513:        <activity android:exported="false" android:name="com.stripe.android.attestation.AttestationActivity" android:theme="@style/StripeTransparentTheme"/>
+514:        <activity android:autoRemoveFromRecents="true" android:exported="false" android:label="@string/APKTOOL_RENAMED_0x7f1415d4" android:name="com.stripe.android.link.LinkActivity" android:theme="@style/StripePaymentSheetDefaultTheme"/>
+515:        <activity android:autoRemoveFromRecents="true" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize" android:launchMode="singleTop" android:name="com.stripe.android.link.LinkForegroundActivity" android:theme="@style/StripeTransparentTheme"/>
+516:        <activity android:autoRemoveFromRecents="true" android:exported="true" android:launchMode="singleInstance" android:name="com.stripe.android.link.LinkRedirectHandlerActivity" android:theme="@style/StripeTransparentTheme">
+518:                <action android:name="android.intent.action.VIEW"/>
+519:                <category android:name="android.intent.category.DEFAULT"/>
+520:                <category android:name="android.intent.category.BROWSABLE"/>
+524:        <activity android:exported="false" android:name="com.stripe.android.view.PaymentAuthWebViewActivity" android:theme="@style/StripeDefaultTheme"/>
+525:        <activity android:exported="false" android:name="com.stripe.android.view.PaymentRelayActivity" android:theme="@style/StripeTransparentTheme"/>
+526:        <activity android:exported="false" android:launchMode="singleTask" android:name="com.stripe.android.payments.StripeBrowserLauncherActivity" android:theme="@style/StripeTransparentTheme"/>
+527:        <activity android:exported="true" android:launchMode="singleTask" android:name="com.stripe.android.payments.StripeBrowserProxyReturnActivity" android:theme="@style/StripeTransparentTheme">
+529:                <action android:name="android.intent.action.VIEW"/>
+530:                <category android:name="android.intent.category.DEFAULT"/>
+531:                <category android:name="android.intent.category.BROWSABLE"/>
+535:        <activity android:exported="false" android:name="com.stripe.android.payments.core.authentication.threeds2.Stripe3ds2TransactionActivity" android:theme="@style/Stripe3dsTransactionTheme"/>
+536:        <activity android:exported="false" android:name="com.stripe.android.googlepaylauncher.GooglePayLauncherActivity" android:theme="@style/StripeGooglePayDefaultTheme"/>
+537:        <activity android:exported="false" android:name="com.stripe.android.googlepaylauncher.GooglePayPaymentMethodLauncherActivity" android:theme="@style/StripeGooglePayDefaultTheme"/>
+538:        <activity android:exported="false" android:name="com.stripe.android.payments.paymentlauncher.PaymentLauncherConfirmationActivity" android:theme="@style/StripePayLauncherDefaultTheme"/>
+539:        <activity android:exported="false" android:name="com.stripe.android.payments.bankaccount.ui.CollectBankAccountActivity" android:theme="@style/StripeTransparentTheme"/>
+540:        <activity android:exported="false" android:name="com.stripe.android.challenge.passive.PassiveChallengeActivity" android:theme="@style/StripeTransparentTheme"/>
+541:        <activity android:exported="false" android:name="com.stripe.android.challenge.passive.warmer.activity.PassiveChallengeWarmerActivity" android:theme="@style/StripeTransparentTheme"/>
+542:        <activity android:exported="false" android:name="com.stripe.android.challenge.confirmation.IntentConfirmationChallengeActivity" android:theme="@style/StripePaymentSheetBaseTheme"/>
+543:        <provider android:authorities="com.openai.chatgpt.persona.provider" android:exported="false" android:grantUriPermissions="true" android:name="com.withpersona.sdk2.inquiry.DocumentFileProvider">
+544:            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/pi2_file_paths"/>
+546:        <activity android:configChanges="orientation|screenSize" android:exported="false" android:name="com.stripe.android.stripe3ds2.views.ChallengeActivity" android:theme="@style/Stripe3DS2Theme"/>
+547:        <service android:enabled="true" android:exported="false" android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder">
+548:            <meta-data android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY" android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl"/>
+550:        <activity android:configChanges="keyboardHidden|orientation|screenLayout|screenSize" android:enabled="true" android:exported="false" android:fitsSystemWindows="true" android:name="androidx.credentials.playservices.controllers.identityauth.HiddenActivity" android:theme="@style/Theme.Hidden"/>
+551:        <activity android:configChanges="keyboardHidden|orientation|screenLayout|screenSize" android:enabled="true" android:exported="false" android:fitsSystemWindows="true" android:name="androidx.credentials.playservices.controllers.identitycredentials.IdentityCredentialApiHiddenActivity" android:theme="@style/Theme.Hidden"/>
+552:        <service android:directBootAware="true" android:exported="false" android:name="com.google.firebase.components.ComponentDiscoveryService">
+553:            <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.ktx.FirebaseMessagingLegacyRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+554:            <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+555:            <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+556:            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+557:            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+558:            <meta-data android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+559:            <meta-data android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+560:            <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+562:        <receiver android:exported="true" android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+564:                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+566:            <meta-data android:name="com.google.android.gms.cloudmessaging.FINISHED_AFTER_HANDLED" android:value="true"/>
+568:        <service android:directBootAware="true" android:exported="false" android:name="com.google.firebase.messaging.FirebaseMessagingService">
+570:                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+573:        <provider android:authorities="com.openai.chatgpt.valdi.clipboard" android:exported="false" android:grantUriPermissions="true" android:name="androidx.core.content.FileProvider">
+574:            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/valdi_clipboard_paths"/>
+576:        <activity android:exported="true" android:launchMode="singleTask" android:name="com.stripe.android.financialconnections.lite.FinancialConnectionsSheetLiteRedirectActivity">
+578:                <action android:name="android.intent.action.VIEW"/>
+579:                <category android:name="android.intent.category.DEFAULT"/>
+580:                <category android:name="android.intent.category.BROWSABLE"/>
+584:        <activity android:name="com.stripe.android.financialconnections.lite.FinancialConnectionsSheetLiteActivity" android:theme="@style/StripeBottomSheetActivityTheme"/>
+585:        <service android:directBootAware="true" android:exported="false" android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService">
+586:            <meta-data android:name="com.google.firebase.components:com.google.mlkit.vision.barcode.internal.BarcodeRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+587:            <meta-data android:name="com.google.firebase.components:com.google.mlkit.vision.face.internal.FaceRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+588:            <meta-data android:name="com.google.firebase.components:com.google.mlkit.vision.text.internal.TextRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+589:            <meta-data android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+590:            <meta-data android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+592:        <provider android:authorities="com.openai.chatgpt.mlkitinitprovider" android:exported="false" android:initOrder="99" android:name="com.google.mlkit.common.internal.MlKitInitProvider"/>
+593:        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:name="com.revenuecat.purchases.amazon.purchasing.ProxyAmazonBillingActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+594:        <activity android:configChanges="orientation|screenSize" android:excludeFromRecents="true" android:name="com.revenuecat.purchases.SimulatedStoreErrorDialogActivity" android:theme="@android:style/Theme.Material.Dialog.Alert"/>
+595:        <meta-data android:name="com.google.android.play.billingclient.version" android:value="8.3.0"/>
+596:        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:exported="false" android:name="com.android.billingclient.api.ProxyBillingActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+597:        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:exported="false" android:name="com.android.billingclient.api.ProxyBillingActivityV2" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+598:        <provider android:authorities="com.openai.chatgpt.perfs-startup-listener" android:exported="false" android:name="papa.internal.PerfsAppStartListener"/>
+599:        <activity android:enabled="true" android:excludeFromRecents="true" android:exported="false" android:name="androidx.glance.appwidget.action.ActionTrampolineActivity" android:theme="@android:style/Theme.NoDisplay"/>
+600:        <activity android:enabled="true" android:exported="false" android:launchMode="singleInstance" android:name="androidx.glance.appwidget.action.InvisibleActionTrampolineActivity" android:noHistory="true" android:taskAffinity="androidx.glance.appwidget.ListAdapterCallbackTrampoline" android:theme="@style/Widget.Glance.AppWidget.CallbackTrampoline"/>
+601:        <receiver android:enabled="true" android:exported="false" android:name="androidx.glance.appwidget.action.ActionCallbackBroadcastReceiver"/>
+602:        <receiver android:enabled="true" android:exported="false" android:name="androidx.glance.appwidget.UnmanagedSessionReceiver"/>
+603:        <receiver android:enabled="true" android:exported="false" android:name="androidx.glance.appwidget.MyPackageReplacedReceiver">
+605:                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+608:        <service android:exported="true" android:name="androidx.glance.appwidget.GlanceRemoteViewsService" android:permission="android.permission.BIND_REMOTEVIEWS"/>
+609:        <activity android:excludeFromRecents="true" android:exported="false" android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+610:        <service android:exported="true" android:name="com.google.android.gms.auth.api.signin.RevocationBoundService" android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION" android:visibleToInstantApps="true"/>
+611:        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+612:        <activity android:exported="false" android:name="com.google.android.gms.common.api.GoogleApiActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+613:        <provider android:authorities="com.openai.chatgpt.androidx-startup" android:exported="false" android:name="androidx.startup.InitializationProvider">
+614:            <meta-data android:name="androidx.work.WorkManagerInitializer" android:value="androidx.startup"/>
+615:            <meta-data android:name="androidx.profileinstaller.ProfileInstallerInitializer" android:value="androidx.startup"/>
+616:            <meta-data android:name="okhttp3.internal.platform.PlatformInitializer" android:value="androidx.startup"/>
+617:            <meta-data android:name="androidx.emoji2.text.EmojiCompatInitializer" android:value="androidx.startup"/>
+618:            <meta-data android:name="androidx.lifecycle.ProcessLifecycleInitializer" android:value="androidx.startup"/>
+620:        <service android:directBootAware="false" android:enabled="@bool/enable_system_job_service_default" android:exported="true" android:name="androidx.work.impl.background.systemjob.SystemJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+621:        <service android:directBootAware="false" android:enabled="@bool/enable_system_foreground_service_default" android:exported="false" android:name="androidx.work.impl.foreground.SystemForegroundService"/>
+622:        <receiver android:directBootAware="false" android:enabled="true" android:exported="false" android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"/>
+623:        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver">
+625:                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+628:        <receiver android:directBootAware="false" android:enabled="true" android:exported="true" android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver" android:permission="android.permission.DUMP">
+630:                <action android:name="androidx.work.diagnostics.REQUEST_DIAGNOSTICS"/>
+633:        <uses-library android:name="androidx.window.extensions" android:required="false"/>
+634:        <uses-library android:name="androidx.window.sidecar" android:required="false"/>
+635:        <service android:directBootAware="true" android:exported="false" android:name="androidx.room.MultiInstanceInvalidationService"/>
+636:        <receiver android:directBootAware="false" android:enabled="true" android:exported="true" android:name="androidx.profileinstaller.ProfileInstallReceiver" android:permission="android.permission.DUMP">
+638:                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE"/>
+641:                <action android:name="androidx.profileinstaller.action.SKIP_FILE"/>
+644:                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE"/>
+647:                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION"/>
+650:        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+651:        <service android:name="androidx.core.widget.RemoteViewsCompatService" android:permission="android.permission.BIND_REMOTEVIEWS"/>
+652:        <provider android:authorities="com.openai.chatgpt.provider.datadog.rum" android:exported="false" android:initOrder="999" android:name="com.datadog.android.rum.DdRumContentProvider"/>
+653:        <service android:exported="false" android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery">
+654:            <meta-data android:name="backend:com.google.android.datatransport.cct.CctBackendFactory" android:value="cct"/>
+656:        <service android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+657:        <receiver android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"/>
+658:        <activity android:exported="false" android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity" android:stateNotNeeded="true" android:theme="@style/Theme.PlayCore.Transparent"/>
+659:        <meta-data android:name="aia-compat-api-min-version" android:value="1"/>
+660:        <provider android:authorities="com.openai.chatgpt.SentryNdkPreloadProvider" android:exported="false" android:initOrder="2000000000" android:name="io.sentry.ndk.SentryNdkPreloadProvider"/>
+661:        <meta-data android:name="io.sentry.gradle-plugin-integrations" android:value="AppStartInstrumentation,ComposeInstrumentation,DatabaseInstrumentation,FileIOInstrumentation,LogcatInstrumentation"/>
+662:        <meta-data android:name="com.android.vending.splits.required" android:value="true"/>
+663:        <meta-data android:name="com.android.stamp.source" android:value="https://play.google.com/store"/>
+664:        <meta-data android:name="com.android.stamp.type" android:value="STAMP_TYPE_DISTRIBUTION_APK"/>
+665:        <meta-data android:name="com.android.vending.splits" android:resource="@xml/splits0"/>
+666:        <meta-data android:name="com.android.vending.derived.apk.id" android:value="4"/>

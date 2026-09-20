@@ -1,0 +1,24 @@
+# Generated Android and Java build output
+**/build/
+**/build-output/
+**/signing/
+
+# Local machine configuration
+.idea/
+*.iml
+local.properties
+*.jks
+*.keystore
+
+# APKs and other large/binary research inputs are intentionally not versioned
+*.apk
+*.apks
+*.aab
+*.zip
+*.jar
+*.so
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp

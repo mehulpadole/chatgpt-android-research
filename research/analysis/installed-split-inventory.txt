@@ -1,0 +1,37 @@
+
+File        : base.apk
+Bytes       : 66328862
+MD5         : F22BBF1F5D8F252079EF6939F48B02D5
+SHA1        : 9E17251287A0775A90D62DAA5DCD8EE842838C5C
+SHA256      : F44373076ACABD320F1FB23E8ED1BFC17871B3D527506EAD613862DCF09B2763
+PackageLine : package: name='com.openai.chatgpt' versionCode='2623031' versionName='1.2026.230' platformBuildVersionName='17' platformBuildVersionCode='37' compileSdkVersion='37' compileSdkVersionCodename='17'
+SplitLine   : 
+Certificate : Signer #1 certificate DN: CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US | Signer #1 certificate SHA-256 digest: b24f4bfbb3cf293f938703b9d87027c1102cc36dc4fa206910e08927db40473c | Signer #1 certificate SHA-1 digest: 51a2f260766c9c1a83b7dd5b4572040ac23e4aea
+
+File        : split_config.en.apk
+Bytes       : 778450
+MD5         : 590C92A3F4C18C19D1BE18F83589201B
+SHA1        : 3E83FBD0212C25E3FE3AF4B976C318D6BAC022C7
+SHA256      : 252C02A42FAF75B7F8DEF98204EA8507559042729423974C21BB710CA6106719
+PackageLine : package: name='com.openai.chatgpt' versionCode='2623031' versionName='' split='config.en'
+SplitLine   : 
+Certificate : Signer #1 certificate DN: CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US | Signer #1 certificate SHA-256 digest: b24f4bfbb3cf293f938703b9d87027c1102cc36dc4fa206910e08927db40473c | Signer #1 certificate SHA-1 digest: 51a2f260766c9c1a83b7dd5b4572040ac23e4aea
+
+File        : split_config.x86_64.apk
+Bytes       : 20173765
+MD5         : DFAA19802FDAA77B85463B777F0D098C
+SHA1        : 47A813D60696CA63D801EA77C80B676BC8B3939B
+SHA256      : 50446237758B7D7811370DC16E9534B2EA8EAE755253717AE545335A5E036E14
+PackageLine : package: name='com.openai.chatgpt' versionCode='2623031' versionName='' split='config.x86_64'
+SplitLine   : 
+Certificate : Signer #1 certificate DN: CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US | Signer #1 certificate SHA-256 digest: b24f4bfbb3cf293f938703b9d87027c1102cc36dc4fa206910e08927db40473c | Signer #1 certificate SHA-1 digest: 51a2f260766c9c1a83b7dd5b4572040ac23e4aea
+
+File        : split_config.xxhdpi.apk
+Bytes       : 106909
+MD5         : 8B3E2DCBF6566AF0268D1C4ADCD6BBC8
+SHA1        : E06F07C9AA557C740579275B8EA6233CECF83A56
+SHA256      : D7A40F66EEF4E96C24A9894C305E6CF72DB8DDA237B9CE7AF458C3EEB6FA0042
+PackageLine : package: name='com.openai.chatgpt' versionCode='2623031' versionName='' split='config.xxhdpi'
+SplitLine   : 
+Certificate : Signer #1 certificate DN: CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US | Signer #1 certificate SHA-256 digest: b24f4bfbb3cf293f938703b9d87027c1102cc36dc4fa206910e08927db40473c | Signer #1 certificate SHA-1 digest: 51a2f260766c9c1a83b7dd5b4572040ac23e4aea
+

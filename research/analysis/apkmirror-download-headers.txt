@@ -1,0 +1,59 @@
+HTTP/1.1 307 Temporary Redirect
+Date: Mon, 07 Sep 2026 18:53:17 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: cloudflare
+Content-Security-Policy-Report-Only: script-src 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; report-uri https://csp-reporting.cloudflare.com/cdn-cgi/script_monitor/report?m=PzRrKQnwp1Ww5wwtrXcVldcuhkqAGvMRTTwy3e3h8pw-1788807196.6620426-1.0.1.1-jmbBXDLDL7WnBG_xbseeWg_fSYBU0VtotM7ZuZjOMac9EY1a7wfXyt_6JoorjC5cDJqieFLphNJGNKvXrhpQV4p96tJx87zeICHMLrR93u6_j6Y.ULvnowp301kYJXRb9ULkp2b4E3jZW_EPIdyzQPolfXGbOHDJpp.vFpuXWWo; report-to cf-csp-endpoint
+Reporting-Endpoints: cf-csp-endpoint="https://csp-reporting.cloudflare.com/cdn-cgi/script_monitor/report?m=PzRrKQnwp1Ww5wwtrXcVldcuhkqAGvMRTTwy3e3h8pw-1788807196.6620426-1.0.1.1-jmbBXDLDL7WnBG_xbseeWg_fSYBU0VtotM7ZuZjOMac9EY1a7wfXyt_6JoorjC5cDJqieFLphNJGNKvXrhpQV4p96tJx87zeICHMLrR93u6_j6Y.ULvnowp301kYJXRb9ULkp2b4E3jZW_EPIdyzQPolfXGbOHDJpp.vFpuXWWo"
+X-Powered-By: PHP/8.3.33
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy: frame-ancestors 'self';
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, must-revalidate
+Expires: Sat, 26 Jul 1997 05:00:00 GMT
+Location: https://www.apkmirror.com/apk/openai/chatgpt/chatgpt-1-2026-230-release/chatgpt-1-2026-230-android-apk-download/?redirected=download_invalid_nonce
+Server-Int: AP-apache
+Server-Hostname: hive
+Server-Ext: AP-nginx
+cf-cache-status: DYNAMIC
+Speculation-Rules: "/cdn-cgi/speculation"
+City: Nagpur
+Country: IN
+Country-Subdivision-1: IN-MH
+Country-Subdivision-2: IN-505
+EU: false
+Postal-Code: 440003
+Region-Code: MH
+Report-To: {"group":"cf-csp-endpoint","max_age":86400,"endpoints":[{"url":"https://csp-reporting.cloudflare.com/cdn-cgi/script_monitor/report?m=PzRrKQnwp1Ww5wwtrXcVldcuhkqAGvMRTTwy3e3h8pw-1788807196.6620426-1.0.1.1-jmbBXDLDL7WnBG_xbseeWg_fSYBU0VtotM7ZuZjOMac9EY1a7wfXyt_6JoorjC5cDJqieFLphNJGNKvXrhpQV4p96tJx87zeICHMLrR93u6_j6Y.ULvnowp301kYJXRb9ULkp2b4E3jZW_EPIdyzQPolfXGbOHDJpp.vFpuXWWo"}]}
+CF-RAY: a377ea532dab9a7e-NAG
+alt-svc: h3=":443"; ma=86400
+
+HTTP/1.1 200 OK
+Date: Mon, 07 Sep 2026 18:53:18 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: cloudflare
+Region-Code: MH
+Postal-Code: 440003
+X-Powered-By: PHP/8.3.33
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy: frame-ancestors 'self';
+X-XSS-Protection: 1; mode=block
+Server-D: lair (r)
+Server-Int: AP-apache
+Server-Hostname: forge
+Server-Ext: AP-nginx
+EU: false
+Link: </?p=15552869>; rel=shortlink
+vary: accept-encoding
+cf-cache-status: DYNAMIC
+Speculation-Rules: "/cdn-cgi/speculation"
+City: Nagpur
+Country: IN
+Country-Subdivision-1: IN-MH
+Country-Subdivision-2: IN-505
+CF-RAY: a377ea5599db9a7e-NAG
+alt-svc: h3=":443"; ma=86400
+
