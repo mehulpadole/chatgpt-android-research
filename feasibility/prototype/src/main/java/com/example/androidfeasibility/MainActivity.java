@@ -145,6 +145,7 @@ public final class MainActivity extends Activity implements ConversationCoordina
         status = new TextView(this);
         status.setText("Idle · local-mock / deterministic");
         status.setTextColor(Color.DKGRAY);
+        status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         root.addView(status, new LinearLayout.LayoutParams(-1, dp(32)));
 
         LinearLayout navigationRow = new LinearLayout(this);
@@ -253,10 +254,12 @@ public final class MainActivity extends Activity implements ConversationCoordina
         composerRow.setGravity(Gravity.CENTER_VERTICAL);
         composer = new EditText(this);
         composer.setHint("Type a synthetic prompt");
+        composer.setContentDescription("Message composer");
         composer.setSingleLine(false);
         composerRow.addView(composer, new LinearLayout.LayoutParams(0, dp(56), 1));
         Button attach = new Button(this);
         attach.setText("Attach");
+        attach.setContentDescription("Attach a file");
         attach.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 startActivityForResult(AndroidAttachmentPicker.documentIntent(), PICK_ATTACHMENT);
@@ -265,18 +268,21 @@ public final class MainActivity extends Activity implements ConversationCoordina
         composerRow.addView(attach, new LinearLayout.LayoutParams(dp(94), dp(56)));
         Button read = new Button(this);
         read.setText("Read");
+        read.setContentDescription("Read the latest assistant response aloud");
         read.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) { readLastAssistant(); }
         });
         composerRow.addView(read, new LinearLayout.LayoutParams(dp(78), dp(56)));
         Button send = new Button(this);
         send.setText("Send");
+        send.setContentDescription("Send message");
         send.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) { sendPrompt(); }
         });
         composerRow.addView(send, new LinearLayout.LayoutParams(dp(86), dp(56)));
         Button stop = new Button(this);
         stop.setText("Stop");
+        stop.setContentDescription("Cancel active response");
         stop.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) { stopPrompt(); }
         });
