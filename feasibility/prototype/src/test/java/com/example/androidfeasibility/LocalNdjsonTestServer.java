@@ -91,7 +91,8 @@ final class LocalNdjsonTestServer implements AutoCloseable {
                         emit(output, delta(turnId, "partial"));
                         return;
                     } else if ("MALFORMED".equals(scenario)) {
-                        emit(output, "not-json");
+                        emit(output, "{\"type\":\"delta\",\"turn_id\":\"" + turnId
+                                + "\",\"text\":\"bad\"} trailing");
                     } else if ("CANCEL".equals(scenario)) {
                         for (int i = 0; i < 100; i++) {
                             emit(output, delta(turnId, "slow-" + i + " "));

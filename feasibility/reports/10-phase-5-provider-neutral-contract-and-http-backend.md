@@ -71,7 +71,7 @@ python3 feasibility/prototype/test-backend/test_backend.py --host 127.0.0.1 --po
 
 ### Pure-Java behavior
 
-`feasibility/prototype/scripts/run-core-tests.sh` passed all six entry points:
+`feasibility/prototype/scripts/run-core-tests.sh` passed all seven entry points:
 
 ```text
 PROVIDER CONTRACT TESTS PASSED
@@ -79,8 +79,9 @@ COORDINATOR CONTRACT TESTS PASSED
 PROVIDER ROUTER TESTS PASSED
 HTTP ADAPTER TESTS PASSED
 PROVIDER CONFORMANCE TESTS PASSED: mock + http
+ANDROID CODEC COMPATIBILITY TESTS PASSED
 ALL CORE TESTS PASSED
-ALL PHASE 5 PURE-JAVA TESTS PASSED (6 test entry points)
+ALL PHASE 5 PURE-JAVA TESTS PASSED (7 test entry points)
 ```
 
 The conformance suite runs the same semantic behaviors against both providers:

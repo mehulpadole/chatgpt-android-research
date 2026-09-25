@@ -101,7 +101,7 @@ public final class NdjsonCodec {
             expect('{');
             Map<String, String> result = new HashMap<>();
             skipWhitespace();
-            if (consume('}')) return Collections.unmodifiableMap(result);
+            if (consume('}')) return finish(result);
             while (true) {
                 String key = parseString();
                 skipWhitespace();
@@ -109,10 +109,16 @@ public final class NdjsonCodec {
                 skipWhitespace();
                 result.put(key, parseScalar());
                 skipWhitespace();
-                if (consume('}')) return Collections.unmodifiableMap(result);
+                if (consume('}')) return finish(result);
                 expect(',');
                 skipWhitespace();
             }
+        }
+
+        private Map<String, String> finish(Map<String, String> result) throws ProtocolException {
+            skipWhitespace();
+            if (position != input.length()) throw new ProtocolException("trailing data");
+            return Collections.unmodifiableMap(result);
         }
 
         private String parseScalar() throws ProtocolException {

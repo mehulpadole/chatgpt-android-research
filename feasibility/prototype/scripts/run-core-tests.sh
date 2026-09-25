@@ -11,9 +11,14 @@ mapfile -t main_sources < <(
     ! -name 'AndroidConversationCodec.java' \
     | sort
 )
-mapfile -t test_sources < <(find "$root/src/test/java" -name '*.java' | sort)
+mapfile -t test_sources < <(find "$root/src/test/java" -name '*.java' ! -name 'AndroidCodecCompatibilityTest.java' | sort)
 
 javac --release 8 -d "$out" "${main_sources[@]}" "${test_sources[@]}"
+javac --release 8 -cp "$out" -d "$out" \
+  "$root/src/main/java/com/example/androidfeasibility/AndroidConversationCodec.java" \
+  "$root/src/test/java/org/json/JSONObject.java" \
+  "$root/src/test/java/org/json/JSONArray.java" \
+  "$root/src/test/java/com/example/androidfeasibility/AndroidCodecCompatibilityTest.java"
 
 tests=(
   com.example.androidfeasibility.ProviderContractTest
@@ -21,6 +26,7 @@ tests=(
   com.example.androidfeasibility.ProviderRouterTest
   com.example.androidfeasibility.HttpStreamingProviderAdapterTest
   com.example.androidfeasibility.ProviderConformanceTest
+  com.example.androidfeasibility.AndroidCodecCompatibilityTest
   com.example.androidfeasibility.PrototypeCoreTest
 )
 for test_class in "${tests[@]}"; do

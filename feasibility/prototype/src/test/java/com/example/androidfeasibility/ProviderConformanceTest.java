@@ -75,6 +75,7 @@ public final class ProviderConformanceTest {
         testSuccessfulStreaming(name, factory);
         testEmptyCompletion(name, factory);
         testCancellation(name, factory);
+        testCancellationAfterCompletion(name, factory);
         testFailures(name, factory);
         testTerminalIdempotence(name, factory);
         testStableIdsPersistenceAndRestoration(name, factory);
@@ -123,6 +124,20 @@ public final class ProviderConformanceTest {
             Message assistant = coordinator.snapshot().messages.get(1);
             check(assistant.status == MessageStatus.CANCELLED, name + ": cancel must be terminal");
             check(assistant.content.equals(content), name + ": late content after cancel must be ignored");
+        }
+    }
+
+    private static void testCancellationAfterCompletion(String name, ProviderFactory factory)
+            throws Exception {
+        try (Harness harness = factory.create("NORMAL")) {
+            RecordingListener listener = new RecordingListener();
+            ConversationCoordinator coordinator = coordinator(new InMemoryConversationRepository(),
+                    harness.provider, listener);
+            String turn = coordinator.startTurn("cancel after complete " + name);
+            await(listener, "completion before cancellation");
+            coordinator.cancel(turn);
+            check(coordinator.snapshot().messages.get(1).status == MessageStatus.COMPLETED,
+                    name + ": cancellation after completion must be ignored");
         }
     }
 
