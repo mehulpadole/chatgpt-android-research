@@ -10,6 +10,8 @@ mapfile -t main_sources < <(
     ! -name 'JsonConversationRepository.java' \
     ! -name 'AndroidConversationCodec.java' \
     ! -name 'AndroidCredentialStore.java' \
+    ! -name 'AndroidAttachmentPicker.java' \
+    ! -name 'AndroidAttachmentStore.java' \
     | sort
 )
 mapfile -t test_sources < <(find "$root/src/test/java" -name '*.java' \
@@ -30,6 +32,8 @@ tests=(
   com.example.androidfeasibility.ProviderSettingsControllerTest
   com.example.androidfeasibility.AttachmentValidatorTest
   com.example.androidfeasibility.AttachmentContractTest
+  com.example.androidfeasibility.AttachmentPreparationTest
+  com.example.androidfeasibility.OpenRouterAttachmentAdapterTest
   com.example.androidfeasibility.ProviderContractTest
   com.example.androidfeasibility.CoordinatorContractTest
   com.example.androidfeasibility.ProviderRouterTest

@@ -13,11 +13,29 @@ public final class OpenRouterCodec {
     private OpenRouterCodec() {}
 
     public static String encodeRequest(ProviderRequest request, boolean stream) {
+        return encodeRequest(request, Collections.<PreparedAttachment>emptyList(), stream);
+    }
+
+    public static String encodeRequest(ProviderRequest request,
+                                       List<PreparedAttachment> attachments, boolean stream) {
         if (request == null) throw new IllegalArgumentException("request is null");
+        List<PreparedAttachment> prepared = attachments == null
+                ? Collections.<PreparedAttachment>emptyList() : attachments;
         StringBuilder body = new StringBuilder();
         body.append("{\"model\":").append(quote(request.modelId));
-        body.append(",\"messages\":[{\"role\":\"user\",\"content\":")
-                .append(quote(request.prompt)).append("}]");
+        body.append(",\"messages\":[{\"role\":\"user\",\"content\":");
+        if (prepared.isEmpty()) {
+            body.append(quote(request.prompt));
+        } else {
+            body.append('[').append("{\"type\":\"text\",\"text\":")
+                    .append(quote(request.prompt)).append('}');
+            for (PreparedAttachment attachment : prepared) {
+                body.append(",{\"type\":\"image_url\",\"image_url\":{\"url\":")
+                        .append(quote(attachment.dataUrl)).append("}}");
+            }
+            body.append(']');
+        }
+        body.append("}]");
         body.append(",\"stream\":").append(stream ? "true" : "false");
         body.append(",\"metadata\":{");
         body.append("\"conversation_id\":").append(quote(request.conversationId));

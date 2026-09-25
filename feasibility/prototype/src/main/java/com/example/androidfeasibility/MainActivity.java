@@ -2,6 +2,7 @@ package com.example.androidfeasibility;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -19,10 +20,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public final class MainActivity extends Activity implements ConversationCoordinator.Listener {
+    private static final int PICK_ATTACHMENT = 7001;
     private ConversationCoordinator coordinator;
     private MockProvider mockProvider;
     private HttpStreamingProviderAdapter httpProvider;
@@ -30,6 +33,8 @@ public final class MainActivity extends Activity implements ConversationCoordina
     private AndroidCredentialStore credentialStore;
     private ProviderSettingsController providerSettings;
     private ProviderRouter router;
+    private AndroidAttachmentStore attachmentStore;
+    private ComposerDraft composerDraft;
     private LinearLayout messages;
     private ScrollView scroll;
     private EditText composer;
@@ -46,6 +51,8 @@ public final class MainActivity extends Activity implements ConversationCoordina
         mockProvider = new MockProvider();
         credentialStore = new AndroidCredentialStore(this);
         providerSettings = new ProviderSettingsController(credentialStore);
+        attachmentStore = new AndroidAttachmentStore(this);
+        composerDraft = new ComposerDraft();
         Map<String, ProviderAdapter> adapters = new HashMap<>();
         adapters.put("local-mock", mockProvider);
         try {
@@ -160,6 +167,14 @@ public final class MainActivity extends Activity implements ConversationCoordina
         composer.setHint("Type a synthetic prompt");
         composer.setSingleLine(false);
         composerRow.addView(composer, new LinearLayout.LayoutParams(0, dp(56), 1));
+        Button attach = new Button(this);
+        attach.setText("Attach");
+        attach.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) {
+                startActivityForResult(AndroidAttachmentPicker.documentIntent(), PICK_ATTACHMENT);
+            }
+        });
+        composerRow.addView(attach, new LinearLayout.LayoutParams(dp(94), dp(56)));
         Button send = new Button(this);
         send.setText("Send");
         send.setOnClickListener(new View.OnClickListener() {
@@ -190,12 +205,29 @@ public final class MainActivity extends Activity implements ConversationCoordina
                 if (openRouterProvider == null) throw new IllegalStateException("OpenRouter endpoint is invalid");
             }
             coordinator.setProviderConfiguration(new ProviderConfiguration(selectedProvider, model));
-            coordinator.startTurn(prompt);
+            composerDraft.setText(prompt);
+            List<Attachment> selectedAttachments = composerDraft.attachments();
+            coordinator.startTurn(prompt, selectedAttachments);
+            composerDraft.clear();
             composer.setText("");
             ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
                     .hideSoftInputFromWindow(composer.getWindowToken(), 0);
         } catch (Exception error) {
             status.setText("Cannot start: " + error.getMessage());
+        }
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != PICK_ATTACHMENT || resultCode != RESULT_OK || data == null
+                || data.getData() == null || attachmentStore == null) return;
+        try {
+            Attachment attachment = attachmentStore.importUri(data.getData(),
+                    coordinator.snapshot().id, "draft");
+            composerDraft.addAttachment(attachment);
+            status.setText("Attachment ready · " + attachment.displayName);
+        } catch (Exception error) {
+            status.setText("Attachment failed: " + error.getMessage());
         }
     }
 

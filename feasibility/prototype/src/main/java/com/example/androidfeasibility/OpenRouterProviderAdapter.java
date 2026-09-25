@@ -11,6 +11,9 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -39,13 +42,21 @@ public final class OpenRouterProviderAdapter implements ProviderAdapter {
     }
 
     @Override public StreamHandle start(final ProviderRequest request, final Listener listener) {
+        return start(request, Collections.<PreparedAttachment>emptyList(), listener);
+    }
+
+    public StreamHandle start(final ProviderRequest request, List<PreparedAttachment> attachments,
+                              final Listener listener) {
         if (shutdown) throw new IllegalStateException("adapter is shut down");
         if (request == null) throw new IllegalArgumentException("request is null");
         if (listener == null) throw new IllegalArgumentException("listener is null");
+        final List<PreparedAttachment> prepared = attachments == null
+                ? Collections.<PreparedAttachment>emptyList()
+                : Collections.unmodifiableList(new ArrayList<>(attachments));
         final OpenRouterStreamHandle handle = new OpenRouterStreamHandle(request.turnId);
         active.add(handle);
         Thread worker = new Thread(new Runnable() {
-            @Override public void run() { runStream(handle, request, listener); }
+            @Override public void run() { runStream(handle, request, prepared, listener); }
         }, "openrouter-stream-" + request.turnId);
         worker.setDaemon(true);
         handle.worker = worker;
@@ -66,7 +77,8 @@ public final class OpenRouterProviderAdapter implements ProviderAdapter {
         for (OpenRouterStreamHandle handle : active) handle.cancel();
     }
 
-    private void runStream(OpenRouterStreamHandle handle, ProviderRequest request, Listener listener) {
+    private void runStream(OpenRouterStreamHandle handle, ProviderRequest request,
+                           List<PreparedAttachment> attachments, Listener listener) {
         HttpURLConnection connection = null;
         boolean terminal = false;
         boolean started = false;
@@ -87,7 +99,7 @@ public final class OpenRouterProviderAdapter implements ProviderAdapter {
             connection.setRequestProperty("Authorization", "Bearer " + secret);
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
             connection.setRequestProperty("Accept", "text/event-stream");
-            byte[] requestBytes = OpenRouterCodec.encodeRequest(request, true)
+            byte[] requestBytes = OpenRouterCodec.encodeRequest(request, attachments, true)
                     .getBytes(StandardCharsets.UTF_8);
             try (OutputStream output = connection.getOutputStream()) {
                 output.write(requestBytes);

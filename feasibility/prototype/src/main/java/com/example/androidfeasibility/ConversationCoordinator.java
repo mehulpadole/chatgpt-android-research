@@ -2,6 +2,7 @@ package com.example.androidfeasibility;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -95,7 +96,16 @@ public final class ConversationCoordinator {
     }
 
     public synchronized String startTurn(String prompt) throws Exception {
-        if (prompt == null || prompt.trim().isEmpty()) throw new IllegalArgumentException("prompt is empty");
+        return startTurn(prompt, Collections.<Attachment>emptyList());
+    }
+
+    public synchronized String startTurn(String prompt, List<Attachment> attachments) throws Exception {
+        List<Attachment> selectedAttachments = attachments == null
+                ? Collections.<Attachment>emptyList() : attachments;
+        if ((prompt == null || prompt.trim().isEmpty()) && selectedAttachments.isEmpty()) {
+            throw new IllegalArgumentException("prompt or attachment is required");
+        }
+        String safePrompt = prompt == null ? "" : prompt;
         TurnState current = state();
         if (current == TurnState.STARTING || current == TurnState.STREAMING) {
             throw new IllegalStateException("a turn is already active");
@@ -104,20 +114,29 @@ public final class ConversationCoordinator {
         final String userId = UUID.randomUUID().toString();
         final String assistantId = UUID.randomUUID().toString();
         Message user = new Message(userId, conversation.id, turnId, Role.USER,
-                prompt, MessageStatus.COMPLETED, providerConfiguration.providerId,
+                "", MessageStatus.COMPLETED, providerConfiguration.providerId,
                 providerConfiguration.modelId, System.currentTimeMillis());
-        user.addContentPart(new TextPart(prompt));
+        if (!safePrompt.isEmpty()) user.addContentPart(new TextPart(safePrompt));
+        for (Attachment attachment : selectedAttachments) {
+            conversation.addAttachment(attachment.copy());
+            if (attachment.detectedMimeType.startsWith("image/")) {
+                user.addContentPart(new ImagePart(attachment.attachmentId, attachment.detectedMimeType));
+            } else {
+                user.addContentPart(new FilePart(attachment.attachmentId, attachment.displayName,
+                        attachment.detectedMimeType));
+            }
+        }
         Message assistant = new Message(assistantId, conversation.id, turnId,
                 Role.ASSISTANT, "", MessageStatus.STREAMING,
                 providerConfiguration.providerId, providerConfiguration.modelId,
                 System.currentTimeMillis());
         if (conversation.messages.isEmpty()) {
-            conversation.title = prompt.length() > 32 ? prompt.substring(0, 32) : prompt;
+            conversation.title = safePrompt.length() > 32 ? safePrompt.substring(0, 32) : safePrompt;
         }
         conversation.add(user);
         conversation.add(assistant);
         final ProviderRequest request = new ProviderRequest(
-                conversation.id, turnId, userId, assistantId, prompt,
+                conversation.id, turnId, userId, assistantId, safePrompt,
                 providerConfiguration.providerId, providerConfiguration.modelId,
                 Collections.<String, String>emptyMap());
         final TurnRuntime runtime = new TurnRuntime(turnId, assistantId, request);
