@@ -11,13 +11,15 @@ Public research archive for the Android client investigation and the separate Ph
 | Phase 3 — runtime observations | Partial | Emulator and logged-out flows were tested. Authenticated conversations, attachments, and voice were not tested. The logged-out welcome screen is not evidence for authenticated features. |
 | Phase 4 — modification feasibility | Complete for the scoped experiment | A reversible resource patch was rebuilt, installed with a separate research key, launched, and visibly executed. This demonstrates the packaging/modification workflow, not a detached ChatGPT backend or OpenRouter integration. |
 | Independent provider-neutral prototype | Complete for the scoped prototype | The prototype exercises streaming, cancellation, failure, persistence, restoration, and background return with a deterministic mock provider. |
+| Phase 5 — provider-neutral contract and local HTTP backend | Complete for contract/build scope; emulator UI pending | The mock and local NDJSON HTTP adapters pass one shared conformance suite, the Android APK builds and signs, and the boundary audit passes. No emulator was connected for the Phase 5 HTTP UI flow. |
 
-Overall: **research complete for the documented scope; product implementation not started**. The next major unknowns are the authenticated backend contract, the compiled Valdi renderer/composer boundary, and production attachment/voice protocols.
+Overall: **research and Phase 5 prototype integration complete for the documented scope; no real provider integration has started**. The next major unknowns remain the authenticated backend contract, the compiled Valdi renderer/composer boundary, and production attachment/voice protocols.
 
 ## Repository contents
 
 - `research/` — Phase 1–3 reports, evidence inventories, and collection scripts.
 - `feasibility/` — Phase 4 reports, experiment log, source references, prototype source, and emulator test evidence.
+- `feasibility/prototype/test-backend/` — deterministic original NDJSON backend used by the Phase 5 HTTP adapter.
 - `feasibility/prototype/` — the independent Java/Android prototype source and build/test scripts.
 
 ## Intentionally omitted
@@ -36,7 +38,7 @@ Set-Location feasibility/prototype
 .\scripts\run-core-tests.ps1
 ```
 
-The original emulator smoke-test screenshots and UI XML are in `feasibility/tests/`. The prototype uses a deterministic mock provider; it does not log in to ChatGPT or call OpenAI/OpenRouter.
+The original emulator smoke-test screenshots and UI XML are in `feasibility/tests/`. The prototype uses a deterministic mock provider and an original local NDJSON test backend; it does not log in to ChatGPT or call OpenAI/OpenRouter.
 
 ## Evidence rules
 
