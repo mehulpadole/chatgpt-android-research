@@ -1,0 +1,8 @@
+# Development-only configuration for the standalone Phase 5 prototype.
+# The Android emulator reaches a host-bound backend through 10.0.2.2.
+PHASE5_HTTP_BASE_URL=http://10.0.2.2:8765/
+PHASE5_BACKEND_BIND=127.0.0.1
+PHASE5_BACKEND_PORT=8765
+
+# To inject another URL into the app, launch MainActivity with the intent extra
+# named phase5_http_base_url. Never put credentials in this file.

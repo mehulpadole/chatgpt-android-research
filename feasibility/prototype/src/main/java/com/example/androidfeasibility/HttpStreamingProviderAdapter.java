@@ -16,13 +16,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** Provider adapter for the local Phase 5 NDJSON streaming test backend. */
 public final class HttpStreamingProviderAdapter implements ProviderAdapter {
     private final URL baseUrl;
-    private final String scenario;
+    private volatile String scenario;
     private final Set<HttpStreamHandle> active = ConcurrentHashMap.newKeySet();
     private volatile boolean shutdown;
 
     public HttpStreamingProviderAdapter(URL baseUrl, String scenario) {
         if (baseUrl == null) throw new IllegalArgumentException("baseUrl is null");
         this.baseUrl = baseUrl;
+        this.scenario = scenario == null || scenario.isEmpty() ? "NORMAL" : scenario;
+    }
+
+    public void setScenario(String scenario) {
         this.scenario = scenario == null || scenario.isEmpty() ? "NORMAL" : scenario;
     }
 

@@ -1,12 +1,12 @@
 package com.example.androidfeasibility;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.content.Context;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,19 +23,32 @@ import java.util.Set;
 
 public final class MainActivity extends Activity implements ConversationCoordinator.Listener {
     private ConversationCoordinator coordinator;
-    private MockProvider provider;
+    private MockProvider mockProvider;
+    private HttpStreamingProviderAdapter httpProvider;
     private LinearLayout messages;
     private ScrollView scroll;
     private EditText composer;
     private TextView status;
+    private Spinner providerMode;
     private Spinner scenario;
     private final Map<String, TextView> messageViews = new HashMap<>();
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
-        provider = new MockProvider();
-        coordinator = new ConversationCoordinator(new JsonConversationRepository(this), provider, this);
+        mockProvider = new MockProvider();
+        Map<String, ProviderAdapter> adapters = new HashMap<>();
+        adapters.put("local-mock", mockProvider);
+        try {
+            httpProvider = new HttpStreamingProviderAdapter(new URL(httpBaseUrl()), "NORMAL");
+            adapters.put("test-http", httpProvider);
+        } catch (MalformedURLException error) {
+            httpProvider = null;
+        }
+        ProviderRouter router = new ProviderRouter(adapters);
+        coordinator = new ConversationCoordinator(new JsonConversationRepository(this), router, this,
+                new ProviderConfiguration("local-mock", "deterministic"));
         buildUi();
+        if (httpProvider == null) status.setText("HTTP provider unavailable · invalid development URL");
         try {
             coordinator.restore();
         } catch (Exception error) {
@@ -59,8 +74,15 @@ public final class MainActivity extends Activity implements ConversationCoordina
         status.setTextColor(Color.DKGRAY);
         root.addView(status, new LinearLayout.LayoutParams(-1, dp(32)));
 
+        providerMode = new Spinner(this);
+        providerMode.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item,
+                new String[]{"local-mock", "test-http"}));
+        root.addView(providerMode, new LinearLayout.LayoutParams(-1, dp(48)));
+
         scenario = new Spinner(this);
-        String[] names = new String[]{"NORMAL", "SLOW", "FAIL_BEFORE_CONTENT", "FAIL_AFTER_PARTIAL", "EMPTY", "DUPLICATE_TERMINAL"};
+        String[] names = new String[]{"NORMAL", "SLOW", "FAIL_BEFORE_CONTENT", "FAIL_AFTER_PARTIAL", "EMPTY",
+                "DUPLICATE_TERMINAL", "DELTA_AFTER_TERMINAL", "FAIL_AFTER_TERMINAL"};
         scenario.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, names));
         root.addView(scenario, new LinearLayout.LayoutParams(-1, dp(48)));
 
@@ -95,7 +117,13 @@ public final class MainActivity extends Activity implements ConversationCoordina
     private void sendPrompt() {
         String prompt = composer.getText().toString();
         try {
-            coordinator.startTurn(prompt, MockScenario.valueOf(scenario.getSelectedItem().toString()));
+            String selectedProvider = providerMode.getSelectedItem().toString();
+            String selectedScenario = scenario.getSelectedItem().toString();
+            mockProvider.setScenario(MockScenario.valueOf(selectedScenario));
+            if (httpProvider != null) httpProvider.setScenario(selectedScenario);
+            String model = selectedProvider.equals("test-http") ? "ndjson-test" : "deterministic";
+            coordinator.setProviderConfiguration(new ProviderConfiguration(selectedProvider, model));
+            coordinator.startTurn(prompt);
             composer.setText("");
             ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
                     .hideSoftInputFromWindow(composer.getWindowToken(), 0);
@@ -135,7 +163,9 @@ public final class MainActivity extends Activity implements ConversationCoordina
                 messages.addView(view, new LinearLayout.LayoutParams(-1, -2));
             }
             String prefix = message.role == Role.USER ? "You" : "Assistant";
-            view.setText(prefix + " · " + message.status.name() + "\n" + message.content);
+            String failure = message.failureMessage == null || message.failureMessage.isEmpty()
+                    ? "" : "\nError · " + message.failureMessage;
+            view.setText(prefix + " · " + message.status.name() + failure + "\n" + message.content);
             view.setTextColor(message.role == Role.USER ? Color.rgb(35, 65, 95) : Color.rgb(35, 35, 35));
             view.setBackgroundColor(message.role == Role.USER ? Color.rgb(225, 236, 248) : Color.WHITE);
         }
@@ -159,7 +189,13 @@ public final class MainActivity extends Activity implements ConversationCoordina
     }
 
     @Override protected void onDestroy() {
-        provider.shutdown();
+        mockProvider.shutdown();
+        if (httpProvider != null) httpProvider.shutdown();
         super.onDestroy();
+    }
+
+    private String httpBaseUrl() {
+        String extra = getIntent().getStringExtra("phase5_http_base_url");
+        return extra == null || extra.isEmpty() ? "http://10.0.2.2:8765/" : extra;
     }
 }

@@ -18,6 +18,7 @@ javac --release 8 -d "$out" "${main_sources[@]}" "${test_sources[@]}"
 tests=(
   com.example.androidfeasibility.ProviderContractTest
   com.example.androidfeasibility.CoordinatorContractTest
+  com.example.androidfeasibility.ProviderRouterTest
   com.example.androidfeasibility.HttpStreamingProviderAdapterTest
   com.example.androidfeasibility.ProviderConformanceTest
   com.example.androidfeasibility.PrototypeCoreTest

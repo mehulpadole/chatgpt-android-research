@@ -32,7 +32,7 @@ public final class ConversationCoordinator {
     private final ConversationRepository repository;
     private final ProviderAdapter provider;
     private final Listener listener;
-    private final ProviderConfiguration providerConfiguration;
+    private ProviderConfiguration providerConfiguration;
     private final Map<String, TurnRuntime> turns = new HashMap<>();
     private Conversation conversation;
     private String activeTurnId;
@@ -79,6 +79,19 @@ public final class ConversationCoordinator {
         if (activeTurnId == null) return TurnState.IDLE;
         TurnRuntime runtime = turns.get(activeTurnId);
         return runtime == null ? TurnState.IDLE : runtime.state;
+    }
+
+    public synchronized ProviderConfiguration providerConfiguration() {
+        return providerConfiguration;
+    }
+
+    public synchronized void setProviderConfiguration(ProviderConfiguration providerConfiguration) {
+        TurnState current = state();
+        if (current == TurnState.STARTING || current == TurnState.STREAMING) {
+            throw new IllegalStateException("cannot change provider during an active turn");
+        }
+        if (providerConfiguration == null) throw new IllegalArgumentException("provider configuration is null");
+        this.providerConfiguration = providerConfiguration;
     }
 
     public synchronized String startTurn(String prompt) throws Exception {

@@ -12,6 +12,7 @@ $java = 'C:\Program Files\Android\Android Studio\jbr\bin\java.exe'
 $testClasses = @(
     'com.example.androidfeasibility.ProviderContractTest',
     'com.example.androidfeasibility.CoordinatorContractTest',
+    'com.example.androidfeasibility.ProviderRouterTest',
     'com.example.androidfeasibility.HttpStreamingProviderAdapterTest',
     'com.example.androidfeasibility.ProviderConformanceTest',
     'com.example.androidfeasibility.PrototypeCoreTest'
