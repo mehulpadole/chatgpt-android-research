@@ -35,6 +35,10 @@ public final class MainActivity extends Activity implements ConversationCoordina
     private ProviderRouter router;
     private AndroidAttachmentStore attachmentStore;
     private ComposerDraft composerDraft;
+    private SystemTextToSpeechAdapter textToSpeech;
+    private AndroidAudioCaptureController audioCapture;
+    private VoiceSessionCoordinator voiceCoordinator;
+    private Conversation latestConversation;
     private LinearLayout messages;
     private ScrollView scroll;
     private EditText composer;
@@ -53,6 +57,18 @@ public final class MainActivity extends Activity implements ConversationCoordina
         providerSettings = new ProviderSettingsController(credentialStore);
         attachmentStore = new AndroidAttachmentStore(this);
         composerDraft = new ComposerDraft();
+        textToSpeech = new SystemTextToSpeechAdapter(this);
+        audioCapture = new AndroidAudioCaptureController(this);
+        voiceCoordinator = new VoiceSessionCoordinator(audioCapture,
+                new DeterministicSpeechToTextAdapter(), textToSpeech, null,
+                new VoiceSessionCoordinator.Listener() {
+                    @Override public void onStateChanged(VoiceState state, String error) {
+                        statusFromVoice(state, error);
+                    }
+                    @Override public void onTranscript(String transcript) {
+                        if (composer != null) composer.setText(transcript);
+                    }
+                });
         Map<String, ProviderAdapter> adapters = new HashMap<>();
         adapters.put("local-mock", mockProvider);
         try {
@@ -175,6 +191,12 @@ public final class MainActivity extends Activity implements ConversationCoordina
             }
         });
         composerRow.addView(attach, new LinearLayout.LayoutParams(dp(94), dp(56)));
+        Button read = new Button(this);
+        read.setText("Read");
+        read.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) { readLastAssistant(); }
+        });
+        composerRow.addView(read, new LinearLayout.LayoutParams(dp(78), dp(56)));
         Button send = new Button(this);
         send.setText("Send");
         send.setOnClickListener(new View.OnClickListener() {
@@ -280,10 +302,37 @@ public final class MainActivity extends Activity implements ConversationCoordina
     }
 
     @Override public void onChanged(final Conversation conversation, final TurnState state, final String error) {
+        latestConversation = conversation;
         runOnUiThread(new Runnable() {
             @Override public void run() {
                 status.setText(state.name() + (error == null || error.isEmpty() ? "" : " · " + error));
                 render(conversation);
+            }
+        });
+    }
+
+    private void readLastAssistant() {
+        if (voiceCoordinator == null || latestConversation == null) {
+            status.setText("No assistant response to read");
+            return;
+        }
+        List<Message> messagesSnapshot = latestConversation.snapshotMessages();
+        for (int i = messagesSnapshot.size() - 1; i >= 0; i--) {
+            Message message = messagesSnapshot.get(i);
+            if (message.role == Role.ASSISTANT && message.content != null && !message.content.isEmpty()) {
+                voiceCoordinator.startReadAloud(message.content);
+                return;
+            }
+        }
+        status.setText("No assistant response to read");
+    }
+
+    private void statusFromVoice(final VoiceState state, final String error) {
+        if (status == null) return;
+        runOnUiThread(new Runnable() {
+            @Override public void run() {
+                status.setText("Voice · " + state.name()
+                        + (error == null || error.isEmpty() ? "" : " · " + error));
             }
         });
     }
@@ -331,6 +380,9 @@ public final class MainActivity extends Activity implements ConversationCoordina
         mockProvider.shutdown();
         if (httpProvider != null) httpProvider.shutdown();
         if (openRouterProvider != null) openRouterProvider.shutdown();
+        if (voiceCoordinator != null) voiceCoordinator.cancel();
+        if (audioCapture != null) audioCapture.release();
+        if (textToSpeech != null) textToSpeech.shutdown();
         super.onDestroy();
     }
 
