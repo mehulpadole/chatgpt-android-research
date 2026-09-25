@@ -106,6 +106,7 @@ public final class ConversationCoordinator {
         Message user = new Message(userId, conversation.id, turnId, Role.USER,
                 prompt, MessageStatus.COMPLETED, providerConfiguration.providerId,
                 providerConfiguration.modelId, System.currentTimeMillis());
+        user.addContentPart(new TextPart(prompt));
         Message assistant = new Message(assistantId, conversation.id, turnId,
                 Role.ASSISTANT, "", MessageStatus.STREAMING,
                 providerConfiguration.providerId, providerConfiguration.modelId,
@@ -178,7 +179,7 @@ public final class ConversationCoordinator {
                     if (runtime.state == TurnState.STARTING) runtime.state = TurnState.STREAMING;
                     if (runtime.state != TurnState.STREAMING) return;
                     String delta = event.text == null ? "" : event.text;
-                    assistant.content = assistant.content + delta;
+                    assistant.appendText(delta);
                     assistant.status = MessageStatus.STREAMING;
                     checkpoint = assistant.content.length() - runtime.lastPersistedContentLength
                             >= DELTA_CHECKPOINT_CHAR_THRESHOLD;

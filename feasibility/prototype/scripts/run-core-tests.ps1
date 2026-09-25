@@ -5,14 +5,15 @@ New-Item -ItemType Directory -Force -Path $testBuild | Out-Null
 $sourceFiles = Get-ChildItem -LiteralPath (Join-Path $root 'src\main\java') -Recurse -Filter '*.java' |
     Where-Object { $_.Name -notin @('MainActivity.java', 'JsonConversationRepository.java', 'AndroidConversationCodec.java', 'AndroidCredentialStore.java') }
 $testFiles = Get-ChildItem -LiteralPath (Join-Path $root 'src\test\java') -Recurse -Filter '*.java'
-$testFiles = $testFiles | Where-Object { $_.Name -ne 'AndroidCodecCompatibilityTest.java' }
+$testFiles = $testFiles | Where-Object { $_.Name -notin @('AndroidCodecCompatibilityTest.java', 'AttachmentContractTest.java') }
 $javac = 'C:\Program Files\Android\Android Studio\jbr\bin\javac.exe'
 & $javac --release 8 -d $testBuild @($sourceFiles.FullName + $testFiles.FullName)
 if ($LASTEXITCODE -ne 0) { throw "javac failed with exit code $LASTEXITCODE" }
 $codecSource = Join-Path $root 'src\main\java\com\example\androidfeasibility\AndroidConversationCodec.java'
 $codecStubs = Get-ChildItem -LiteralPath (Join-Path $root 'src\test\java\org\json') -Recurse -Filter '*.java'
 $codecTest = Join-Path $root 'src\test\java\com\example\androidfeasibility\AndroidCodecCompatibilityTest.java'
-& $javac --release 8 -classpath $testBuild -d $testBuild @($codecSource, $codecStubs.FullName, $codecTest)
+$attachmentTest = Join-Path $root 'src\test\java\com\example\androidfeasibility\AttachmentContractTest.java'
+& $javac --release 8 -classpath $testBuild -d $testBuild @($codecSource, $codecStubs.FullName, $codecTest, $attachmentTest)
 if ($LASTEXITCODE -ne 0) { throw "Android codec compatibility test compilation failed" }
 $java = 'C:\Program Files\Android\Android Studio\jbr\bin\java.exe'
 $testClasses = @(
@@ -20,6 +21,8 @@ $testClasses = @(
     'com.example.androidfeasibility.OpenRouterProviderAdapterTest',
     'com.example.androidfeasibility.CredentialBoundaryTest',
     'com.example.androidfeasibility.ProviderSettingsControllerTest',
+    'com.example.androidfeasibility.AttachmentValidatorTest',
+    'com.example.androidfeasibility.AttachmentContractTest',
     'com.example.androidfeasibility.ProviderContractTest',
     'com.example.androidfeasibility.CoordinatorContractTest',
     'com.example.androidfeasibility.ProviderRouterTest',
