@@ -38,6 +38,10 @@ tests=(
   com.example.androidfeasibility.OpenRouterAttachmentAdapterTest
   com.example.androidfeasibility.VoiceSessionCoordinatorTest
   com.example.androidfeasibility.VoiceContractTest
+  com.example.androidfeasibility.SyncContractTest
+  com.example.androidfeasibility.SyncOutboxTest
+  com.example.androidfeasibility.SyncConflictTest
+  com.example.androidfeasibility.SyncRetryTest
   com.example.androidfeasibility.ProviderContractTest
   com.example.androidfeasibility.CoordinatorContractTest
   com.example.androidfeasibility.ProviderRouterTest
