@@ -46,6 +46,7 @@ tests=(
   com.example.androidfeasibility.TwoDeviceSimulationTest
   com.example.androidfeasibility.ProviderRegistryTest
   com.example.androidfeasibility.ProjectMemoryTest
+  com.example.androidfeasibility.ImportExportSecurityTest
   com.example.androidfeasibility.ProviderContractTest
   com.example.androidfeasibility.CoordinatorContractTest
   com.example.androidfeasibility.ProviderRouterTest

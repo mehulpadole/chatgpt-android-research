@@ -94,11 +94,13 @@ public final class MainActivity extends Activity implements ConversationCoordina
             statusSafe("Provider registry unavailable: " + error.getMessage());
         }
         try {
-            httpProvider = new HttpStreamingProviderAdapter(new URL(httpBaseUrl()), "NORMAL");
-            providerRegistry.register(new ProviderDefinition("test-http", "Local staging HTTP",
-                    new URL(httpBaseUrl()),
-                    new HashSet<>(java.util.Arrays.asList(ProviderCapabilities.TEXT, ProviderCapabilities.STREAMING))),
-                    httpProvider);
+            if (BuildProfile.testControlsEnabled()) {
+                httpProvider = new HttpStreamingProviderAdapter(new URL(httpBaseUrl()), "NORMAL");
+                providerRegistry.register(new ProviderDefinition("test-http", "Local staging HTTP",
+                        new URL(httpBaseUrl()),
+                        new HashSet<>(java.util.Arrays.asList(ProviderCapabilities.TEXT, ProviderCapabilities.STREAMING))),
+                        httpProvider);
+            }
         } catch (MalformedURLException error) {
             httpProvider = null;
         } catch (IllegalArgumentException error) {
@@ -199,9 +201,12 @@ public final class MainActivity extends Activity implements ConversationCoordina
         root.addView(providerActions, new LinearLayout.LayoutParams(-1, dp(56)));
 
         providerMode = new Spinner(this);
+        String[] providerChoices = BuildProfile.testControlsEnabled()
+                ? new String[]{"local-mock", "test-http", "openrouter"}
+                : new String[]{"openrouter"};
         providerMode.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item,
-                new String[]{"local-mock", "test-http", "openrouter"}));
+                providerChoices));
         root.addView(providerMode, new LinearLayout.LayoutParams(-1, dp(48)));
 
         TextView syncHeading = new TextView(this);
@@ -225,10 +230,18 @@ public final class MainActivity extends Activity implements ConversationCoordina
         root.addView(syncNow, new LinearLayout.LayoutParams(-1, dp(52)));
 
         scenario = new Spinner(this);
-        String[] names = new String[]{"NORMAL", "SLOW", "FAIL_BEFORE_CONTENT", "FAIL_AFTER_PARTIAL", "EMPTY",
-                "DUPLICATE_TERMINAL", "DELTA_AFTER_TERMINAL", "FAIL_AFTER_TERMINAL"};
+        String[] names = BuildProfile.testControlsEnabled()
+                ? new String[]{"NORMAL", "SLOW", "FAIL_BEFORE_CONTENT", "FAIL_AFTER_PARTIAL", "EMPTY",
+                "DUPLICATE_TERMINAL", "DELTA_AFTER_TERMINAL", "FAIL_AFTER_TERMINAL"}
+                : new String[]{"NORMAL"};
         scenario.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, names));
         root.addView(scenario, new LinearLayout.LayoutParams(-1, dp(48)));
+
+        TextView privacy = new TextView(this);
+        privacy.setText(PrivacyDisclosure.TEXT);
+        privacy.setTextSize(12);
+        privacy.setTextColor(Color.DKGRAY);
+        root.addView(privacy, new LinearLayout.LayoutParams(-1, dp(54)));
 
         scroll = new ScrollView(this);
         messages = new LinearLayout(this);

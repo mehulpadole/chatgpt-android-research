@@ -26,20 +26,7 @@ public final class ProviderDefinition {
     }
 
     private URL validateEndpoint(URL value) {
-        if (value == null) throw new IllegalArgumentException("provider endpoint is null");
-        String protocol = value.getProtocol();
-        if ("https".equalsIgnoreCase(protocol)) return value;
-        if (!"http".equalsIgnoreCase(protocol)) {
-            throw new IllegalArgumentException("provider endpoint must use HTTPS or local HTTP");
-        }
-        String host = value.getHost();
-        boolean local = "localhost".equalsIgnoreCase(host) || "127.0.0.1".equals(host)
-                || "::1".equals(host) || "10.0.2.2".equals(host);
-        if (!local) throw new IllegalArgumentException("cleartext provider endpoint must be local");
-        if (value.getUserInfo() != null || value.getRef() != null) {
-            throw new IllegalArgumentException("provider endpoint must not contain user info or fragment");
-        }
-        return value;
+        return EndpointValidator.validate(value);
     }
 
     private static String require(String value, String name) {

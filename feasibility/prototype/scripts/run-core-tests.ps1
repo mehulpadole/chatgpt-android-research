@@ -33,6 +33,7 @@ $testClasses = @(
     'com.example.androidfeasibility.SyncRetryTest',
     'com.example.androidfeasibility.ProviderRegistryTest',
     'com.example.androidfeasibility.ProjectMemoryTest',
+    'com.example.androidfeasibility.ImportExportSecurityTest',
     'com.example.androidfeasibility.SyncIntegrationTest',
     'com.example.androidfeasibility.TwoDeviceSimulationTest',
     'com.example.androidfeasibility.ProviderContractTest',
