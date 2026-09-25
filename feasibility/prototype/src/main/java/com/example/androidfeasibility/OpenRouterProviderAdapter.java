@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** OpenRouter chat-completions adapter; transport details stop at ProviderAdapter. */
 public final class OpenRouterProviderAdapter implements ProviderAdapter {
-    private final URL baseUrl;
+    private volatile URL baseUrl;
     private final ProviderCredentialStore credentials;
     private final Set<OpenRouterStreamHandle> active = ConcurrentHashMap.newKeySet();
     private final int connectTimeoutMs;
@@ -54,6 +54,12 @@ public final class OpenRouterProviderAdapter implements ProviderAdapter {
     }
 
     public int activeStreamCount() { return active.size(); }
+
+    public synchronized void setBaseUrl(URL baseUrl) {
+        if (baseUrl == null) throw new IllegalArgumentException("baseUrl is null");
+        if (!active.isEmpty()) throw new IllegalStateException("cannot change endpoint during a stream");
+        this.baseUrl = baseUrl;
+    }
 
     public void shutdown() {
         shutdown = true;

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.text.InputType;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,17 +26,26 @@ public final class MainActivity extends Activity implements ConversationCoordina
     private ConversationCoordinator coordinator;
     private MockProvider mockProvider;
     private HttpStreamingProviderAdapter httpProvider;
+    private OpenRouterProviderAdapter openRouterProvider;
+    private AndroidCredentialStore credentialStore;
+    private ProviderSettingsController providerSettings;
+    private ProviderRouter router;
     private LinearLayout messages;
     private ScrollView scroll;
     private EditText composer;
     private TextView status;
     private Spinner providerMode;
     private Spinner scenario;
+    private EditText endpointInput;
+    private EditText modelInput;
+    private EditText apiKeyInput;
     private final Map<String, TextView> messageViews = new HashMap<>();
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         mockProvider = new MockProvider();
+        credentialStore = new AndroidCredentialStore(this);
+        providerSettings = new ProviderSettingsController(credentialStore);
         Map<String, ProviderAdapter> adapters = new HashMap<>();
         adapters.put("local-mock", mockProvider);
         try {
@@ -44,7 +54,14 @@ public final class MainActivity extends Activity implements ConversationCoordina
         } catch (MalformedURLException error) {
             httpProvider = null;
         }
-        ProviderRouter router = new ProviderRouter(adapters);
+        try {
+            providerSettings.setEndpoint(openRouterBaseUrl());
+            openRouterProvider = new OpenRouterProviderAdapter(providerSettings.endpoint(), credentialStore);
+            adapters.put("openrouter", openRouterProvider);
+        } catch (Exception error) {
+            openRouterProvider = null;
+        }
+        router = new ProviderRouter(adapters);
         coordinator = new ConversationCoordinator(new JsonConversationRepository(this), router, this,
                 new ProviderConfiguration("local-mock", "deterministic"));
         buildUi();
@@ -74,10 +91,55 @@ public final class MainActivity extends Activity implements ConversationCoordina
         status.setTextColor(Color.DKGRAY);
         root.addView(status, new LinearLayout.LayoutParams(-1, dp(32)));
 
+        TextView providerHeading = new TextView(this);
+        providerHeading.setText("OpenRouter provider settings");
+        providerHeading.setTextSize(16);
+        providerHeading.setTextColor(Color.rgb(30, 30, 30));
+        root.addView(providerHeading, new LinearLayout.LayoutParams(-1, dp(34)));
+
+        endpointInput = new EditText(this);
+        endpointInput.setSingleLine(true);
+        endpointInput.setHint("Endpoint URL");
+        endpointInput.setText(providerSettings.endpoint().toString());
+        root.addView(endpointInput, new LinearLayout.LayoutParams(-1, dp(52)));
+
+        modelInput = new EditText(this);
+        modelInput.setSingleLine(true);
+        modelInput.setHint("Model identifier");
+        modelInput.setText(providerSettings.modelId());
+        root.addView(modelInput, new LinearLayout.LayoutParams(-1, dp(52)));
+
+        apiKeyInput = new EditText(this);
+        apiKeyInput.setSingleLine(true);
+        apiKeyInput.setHint("API key (never shown after save)");
+        apiKeyInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        root.addView(apiKeyInput, new LinearLayout.LayoutParams(-1, dp(52)));
+
+        LinearLayout providerActions = new LinearLayout(this);
+        Button saveProvider = new Button(this);
+        saveProvider.setText("Save key");
+        saveProvider.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) { saveProviderSettings(); }
+        });
+        providerActions.addView(saveProvider, new LinearLayout.LayoutParams(0, dp(50), 1));
+        Button testProvider = new Button(this);
+        testProvider.setText("Test");
+        testProvider.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) { testProviderSettings(); }
+        });
+        providerActions.addView(testProvider, new LinearLayout.LayoutParams(0, dp(50), 1));
+        Button removeProvider = new Button(this);
+        removeProvider.setText("Remove");
+        removeProvider.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) { removeProviderSettings(); }
+        });
+        providerActions.addView(removeProvider, new LinearLayout.LayoutParams(0, dp(50), 1));
+        root.addView(providerActions, new LinearLayout.LayoutParams(-1, dp(56)));
+
         providerMode = new Spinner(this);
         providerMode.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item,
-                new String[]{"local-mock", "test-http"}));
+                new String[]{"local-mock", "test-http", "openrouter"}));
         root.addView(providerMode, new LinearLayout.LayoutParams(-1, dp(48)));
 
         scenario = new Spinner(this);
@@ -122,6 +184,11 @@ public final class MainActivity extends Activity implements ConversationCoordina
             mockProvider.setScenario(MockScenario.valueOf(selectedScenario));
             if (httpProvider != null) httpProvider.setScenario(selectedScenario);
             String model = selectedProvider.equals("test-http") ? "ndjson-test" : "deterministic";
+            if (selectedProvider.equals("openrouter")) {
+                applyProviderFields();
+                model = providerSettings.modelId();
+                if (openRouterProvider == null) throw new IllegalStateException("OpenRouter endpoint is invalid");
+            }
             coordinator.setProviderConfiguration(new ProviderConfiguration(selectedProvider, model));
             coordinator.startTurn(prompt);
             composer.setText("");
@@ -138,6 +205,46 @@ public final class MainActivity extends Activity implements ConversationCoordina
         } catch (Exception error) {
             status.setText("Cancel failed: " + error.getMessage());
         }
+    }
+
+    private void saveProviderSettings() {
+        try {
+            applyProviderFields();
+            String key = apiKeyInput.getText().toString();
+            if (!key.isEmpty()) providerSettings.saveCredential(key);
+            apiKeyInput.setText("");
+            status.setText("Provider saved · " + providerSettings.maskedCredential());
+        } catch (Exception error) {
+            status.setText("Provider settings invalid: " + error.getMessage());
+        }
+    }
+
+    private void testProviderSettings() {
+        try {
+            applyProviderFields();
+            String key = apiKeyInput.getText().toString();
+            if (!key.isEmpty()) {
+                providerSettings.saveCredential(key);
+                apiKeyInput.setText("");
+            }
+            ProviderSettingsController.State result = providerSettings.testConnection();
+            status.setText("OpenRouter test · " + result.name()
+                    + (providerSettings.lastError().isEmpty() ? "" : " · " + providerSettings.lastError()));
+        } catch (Exception error) {
+            status.setText("Provider test failed: " + error.getMessage());
+        }
+    }
+
+    private void removeProviderSettings() {
+        providerSettings.removeCredential();
+        apiKeyInput.setText("");
+        status.setText("OpenRouter credential removed");
+    }
+
+    private void applyProviderFields() throws Exception {
+        providerSettings.setEndpoint(endpointInput.getText().toString());
+        providerSettings.setModel(modelInput.getText().toString());
+        if (openRouterProvider != null) openRouterProvider.setBaseUrl(providerSettings.endpoint());
     }
 
     @Override public void onChanged(final Conversation conversation, final TurnState state, final String error) {
@@ -191,11 +298,17 @@ public final class MainActivity extends Activity implements ConversationCoordina
     @Override protected void onDestroy() {
         mockProvider.shutdown();
         if (httpProvider != null) httpProvider.shutdown();
+        if (openRouterProvider != null) openRouterProvider.shutdown();
         super.onDestroy();
     }
 
     private String httpBaseUrl() {
         String extra = getIntent().getStringExtra("phase5_http_base_url");
         return extra == null || extra.isEmpty() ? "http://10.0.2.2:8765/" : extra;
+    }
+
+    private String openRouterBaseUrl() {
+        String extra = getIntent().getStringExtra("phase6_openrouter_base_url");
+        return extra == null || extra.isEmpty() ? "https://openrouter.ai/" : extra;
     }
 }
