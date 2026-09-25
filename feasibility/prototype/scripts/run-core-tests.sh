@@ -22,6 +22,8 @@ javac --release 8 -cp "$out" -d "$out" \
 
 tests=(
   com.example.androidfeasibility.OpenRouterCodecTest
+  com.example.androidfeasibility.OpenRouterProviderAdapterTest
+  com.example.androidfeasibility.CredentialBoundaryTest
   com.example.androidfeasibility.ProviderContractTest
   com.example.androidfeasibility.CoordinatorContractTest
   com.example.androidfeasibility.ProviderRouterTest

@@ -17,6 +17,8 @@ if ($LASTEXITCODE -ne 0) { throw "Android codec compatibility test compilation f
 $java = 'C:\Program Files\Android\Android Studio\jbr\bin\java.exe'
 $testClasses = @(
     'com.example.androidfeasibility.OpenRouterCodecTest',
+    'com.example.androidfeasibility.OpenRouterProviderAdapterTest',
+    'com.example.androidfeasibility.CredentialBoundaryTest',
     'com.example.androidfeasibility.ProviderContractTest',
     'com.example.androidfeasibility.CoordinatorContractTest',
     'com.example.androidfeasibility.ProviderRouterTest',
