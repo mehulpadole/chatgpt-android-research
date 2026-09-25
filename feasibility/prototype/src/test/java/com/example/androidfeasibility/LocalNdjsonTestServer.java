@@ -62,6 +62,8 @@ final class LocalNdjsonTestServer implements AutoCloseable {
             activeRequests.incrementAndGet();
             try {
                 lastRequestBody = readRequest(exchange.getRequestBody());
+                String turnId = extractString(lastRequestBody, "turn_id");
+                if (turnId.isEmpty()) turnId = "turn-1";
                 if (responseStatus != 200) {
                     byte[] body = "synthetic error".getBytes(StandardCharsets.UTF_8);
                     exchange.sendResponseHeaders(responseStatus, body.length);
@@ -75,36 +77,37 @@ final class LocalNdjsonTestServer implements AutoCloseable {
                 headers.set("Connection", "close");
                 exchange.sendResponseHeaders(200, 0);
                 try (OutputStream output = exchange.getResponseBody()) {
-                    emit(output, "{\"type\":\"started\",\"turn_id\":\"turn-1\",\"request_id\":\"request-1\"}");
+                    emit(output, "{\"type\":\"started\",\"turn_id\":\"" + turnId
+                            + "\",\"request_id\":\"request-1\"}");
                     if ("FAIL_BEFORE_CONTENT".equals(scenario)) {
-                        emit(output, failed("provider", "synthetic pre-content failure", false));
+                        emit(output, failed(turnId, "provider", "synthetic pre-content failure", false));
                     } else if ("EMPTY".equals(scenario)) {
-                        emit(output, completed());
+                        emit(output, completed(turnId));
                     } else if ("FAIL_AFTER_PARTIAL".equals(scenario)) {
-                        emit(output, delta("partial "));
-                        emit(output, delta("content"));
-                        emit(output, failed("provider", "synthetic partial failure", false));
+                        emit(output, delta(turnId, "partial "));
+                        emit(output, delta(turnId, "content"));
+                        emit(output, failed(turnId, "provider", "synthetic partial failure", false));
                     } else if ("DISCONNECT".equals(scenario)) {
-                        emit(output, delta("partial"));
+                        emit(output, delta(turnId, "partial"));
                         return;
                     } else if ("MALFORMED".equals(scenario)) {
                         emit(output, "not-json");
                     } else if ("CANCEL".equals(scenario)) {
                         for (int i = 0; i < 100; i++) {
-                            emit(output, delta("slow-" + i + " "));
+                            emit(output, delta(turnId, "slow-" + i + " "));
                             sleep(50L);
                         }
-                        emit(output, completed());
+                        emit(output, completed(turnId));
                     } else {
                         if ("SLOW".equals(scenario)) sleep(80L);
-                        emit(output, delta("first "));
+                        emit(output, delta(turnId, "first "));
                         if ("SLOW".equals(scenario)) sleep(80L);
-                        emit(output, delta("second"));
-                        emit(output, completed());
-                        if ("DUPLICATE_TERMINAL".equals(scenario)) emit(output, completed());
-                        if ("DELTA_AFTER_TERMINAL".equals(scenario)) emit(output, delta(" late"));
+                        emit(output, delta(turnId, "second"));
+                        emit(output, completed(turnId));
+                        if ("DUPLICATE_TERMINAL".equals(scenario)) emit(output, completed(turnId));
+                        if ("DELTA_AFTER_TERMINAL".equals(scenario)) emit(output, delta(turnId, " late"));
                         if ("FAIL_AFTER_TERMINAL".equals(scenario)) {
-                            emit(output, failed("provider", "late failure", false));
+                            emit(output, failed(turnId, "provider", "late failure", false));
                         }
                     }
                 }
@@ -128,18 +131,27 @@ final class LocalNdjsonTestServer implements AutoCloseable {
             output.flush();
         }
 
-        private String delta(String text) {
-            return "{\"type\":\"delta\",\"turn_id\":\"turn-1\",\"text\":\"" + text + "\"}";
+        private String delta(String turnId, String text) {
+            return "{\"type\":\"delta\",\"turn_id\":\"" + turnId + "\",\"text\":\"" + text + "\"}";
         }
 
-        private String completed() {
-            return "{\"type\":\"completed\",\"turn_id\":\"turn-1\"}";
+        private String completed(String turnId) {
+            return "{\"type\":\"completed\",\"turn_id\":\"" + turnId + "\"}";
         }
 
-        private String failed(String category, String message, boolean retryable) {
-            return "{\"type\":\"failed\",\"turn_id\":\"turn-1\",\"category\":\""
+        private String failed(String turnId, String category, String message, boolean retryable) {
+            return "{\"type\":\"failed\",\"turn_id\":\"" + turnId + "\",\"category\":\""
                     + category + "\",\"message\":\"" + message + "\",\"retryable\":"
                     + retryable + "}";
+        }
+
+        private String extractString(String json, String key) {
+            String marker = "\"" + key + "\":\"";
+            int start = json.indexOf(marker);
+            if (start < 0) return "";
+            start += marker.length();
+            int end = json.indexOf('"', start);
+            return end < 0 ? "" : json.substring(start, end);
         }
 
         private void sleep(long millis) throws IOException {
