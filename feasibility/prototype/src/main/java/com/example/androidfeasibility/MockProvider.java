@@ -13,39 +13,67 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class MockProvider implements ProviderAdapter {
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
     private final Map<String, List<ScheduledFuture<?>>> jobs = new ConcurrentHashMap<>();
+    private volatile MockScenario scenario;
+
+    public MockProvider() {
+        this(MockScenario.NORMAL);
+    }
+
+    public MockProvider(MockScenario scenario) {
+        setScenario(scenario);
+    }
+
+    public void setScenario(MockScenario scenario) {
+        this.scenario = scenario == null ? MockScenario.NORMAL : scenario;
+    }
 
     @Override
-    public StreamHandle start(final Request request, final Listener listener) {
+    public StreamHandle start(final ProviderRequest request, final Listener listener) {
         final AtomicBoolean cancelled = new AtomicBoolean(false);
         final List<ScheduledFuture<?>> futures = new ArrayList<>();
+        final MockScenario selectedScenario = scenario;
         jobs.put(request.turnId, futures);
-        long step = request.scenario == MockScenario.SLOW ? 220L : 45L;
+        long step = selectedScenario == MockScenario.SLOW ? 220L : 45L;
         schedule(request, listener, cancelled, futures, StreamEvent.started(request.turnId), 10L);
 
-        if (request.scenario == MockScenario.FAIL_BEFORE_CONTENT) {
+        if (selectedScenario == MockScenario.FAIL_BEFORE_CONTENT) {
             schedule(request, listener, cancelled, futures,
-                    StreamEvent.error(request.turnId, "mock failure before first content"), 80L);
-        } else if (request.scenario == MockScenario.EMPTY) {
+                    StreamEvent.failed(request.turnId, new ProviderError(
+                            ProviderError.Category.PROVIDER,
+                            "mock failure before first content", false)), 80L);
+        } else if (selectedScenario == MockScenario.EMPTY) {
             schedule(request, listener, cancelled, futures, StreamEvent.completed(request.turnId), 80L);
         } else {
             String response = "Deterministic local reply for: " + request.prompt + ".";
             String[] chunks = response.split("(?<= )");
-            int limit = request.scenario == MockScenario.FAIL_AFTER_PARTIAL
+            int limit = selectedScenario == MockScenario.FAIL_AFTER_PARTIAL
                     ? Math.min(3, chunks.length) : chunks.length;
             for (int i = 0; i < limit; i++) {
                 schedule(request, listener, cancelled, futures,
                         StreamEvent.delta(request.turnId, chunks[i]), 80L + (i * step));
             }
             long terminalAt = 80L + (limit * step) + 20L;
-            if (request.scenario == MockScenario.FAIL_AFTER_PARTIAL) {
+            if (selectedScenario == MockScenario.FAIL_AFTER_PARTIAL) {
                 schedule(request, listener, cancelled, futures,
-                        StreamEvent.error(request.turnId, "mock failure after partial content"), terminalAt);
+                        StreamEvent.failed(request.turnId, new ProviderError(
+                                ProviderError.Category.PROVIDER,
+                                "mock failure after partial content", false)), terminalAt);
             } else {
                 schedule(request, listener, cancelled, futures,
                         StreamEvent.completed(request.turnId), terminalAt);
-                if (request.scenario == MockScenario.DUPLICATE_TERMINAL) {
+                if (selectedScenario == MockScenario.DUPLICATE_TERMINAL) {
                     schedule(request, listener, cancelled, futures,
                             StreamEvent.completed(request.turnId), terminalAt + 35L);
+                }
+                if (selectedScenario == MockScenario.DELTA_AFTER_TERMINAL) {
+                    schedule(request, listener, cancelled, futures,
+                            StreamEvent.delta(request.turnId, " late"), terminalAt + 35L);
+                }
+                if (selectedScenario == MockScenario.FAIL_AFTER_TERMINAL) {
+                    schedule(request, listener, cancelled, futures,
+                            StreamEvent.failed(request.turnId, new ProviderError(
+                                    ProviderError.Category.PROVIDER,
+                                    "late failure", false)), terminalAt + 35L);
                 }
             }
         }
@@ -61,7 +89,7 @@ public final class MockProvider implements ProviderAdapter {
         };
     }
 
-    private void schedule(final Request request, final Listener listener,
+    private void schedule(final ProviderRequest request, final Listener listener,
                           final AtomicBoolean cancelled, final List<ScheduledFuture<?>> futures,
                           final StreamEvent event, long delayMs) {
         ScheduledFuture<?> future = executor.schedule(new Runnable() {
