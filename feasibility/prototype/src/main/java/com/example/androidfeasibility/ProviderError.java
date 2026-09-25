@@ -9,6 +9,9 @@ public final class ProviderError {
         PROVIDER,
         AUTHENTICATION,
         RATE_LIMIT,
+        INVALID_REQUEST,
+        MODEL_UNAVAILABLE,
+        PROVIDER_UNAVAILABLE,
         CANCELLED,
         UNKNOWN
     }

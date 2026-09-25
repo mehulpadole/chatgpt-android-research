@@ -9,18 +9,45 @@ mapfile -t main_sources < <(
     ! -name 'MainActivity.java' \
     ! -name 'JsonConversationRepository.java' \
     ! -name 'AndroidConversationCodec.java' \
+    ! -name 'AndroidCredentialStore.java' \
+    ! -name 'AndroidAttachmentPicker.java' \
+    ! -name 'AndroidAttachmentStore.java' \
+    ! -name 'SystemTextToSpeechAdapter.java' \
+    ! -name 'AndroidAudioCaptureController.java' \
     | sort
 )
-mapfile -t test_sources < <(find "$root/src/test/java" -name '*.java' ! -name 'AndroidCodecCompatibilityTest.java' | sort)
+mapfile -t test_sources < <(find "$root/src/test/java" -name '*.java' \
+  ! -name 'AndroidCodecCompatibilityTest.java' ! -name 'AttachmentContractTest.java' | sort)
 
 javac --release 8 -d "$out" "${main_sources[@]}" "${test_sources[@]}"
 javac --release 8 -cp "$out" -d "$out" \
   "$root/src/main/java/com/example/androidfeasibility/AndroidConversationCodec.java" \
   "$root/src/test/java/org/json/JSONObject.java" \
   "$root/src/test/java/org/json/JSONArray.java" \
-  "$root/src/test/java/com/example/androidfeasibility/AndroidCodecCompatibilityTest.java"
+  "$root/src/test/java/com/example/androidfeasibility/AndroidCodecCompatibilityTest.java" \
+  "$root/src/test/java/com/example/androidfeasibility/AttachmentContractTest.java"
 
 tests=(
+  com.example.androidfeasibility.OpenRouterCodecTest
+  com.example.androidfeasibility.OpenRouterProviderAdapterTest
+  com.example.androidfeasibility.CredentialBoundaryTest
+  com.example.androidfeasibility.ProviderSettingsControllerTest
+  com.example.androidfeasibility.AttachmentValidatorTest
+  com.example.androidfeasibility.AttachmentContractTest
+  com.example.androidfeasibility.AttachmentPreparationTest
+  com.example.androidfeasibility.OpenRouterAttachmentAdapterTest
+  com.example.androidfeasibility.VoiceSessionCoordinatorTest
+  com.example.androidfeasibility.VoiceContractTest
+  com.example.androidfeasibility.SyncContractTest
+  com.example.androidfeasibility.SyncOutboxTest
+  com.example.androidfeasibility.SyncConflictTest
+  com.example.androidfeasibility.SyncRetryTest
+  com.example.androidfeasibility.SyncIntegrationTest
+  com.example.androidfeasibility.TwoDeviceSimulationTest
+  com.example.androidfeasibility.ProviderRegistryTest
+  com.example.androidfeasibility.ProjectMemoryTest
+  com.example.androidfeasibility.ImportExportSecurityTest
+  com.example.androidfeasibility.PerformanceLifecycleTest
   com.example.androidfeasibility.ProviderContractTest
   com.example.androidfeasibility.CoordinatorContractTest
   com.example.androidfeasibility.ProviderRouterTest

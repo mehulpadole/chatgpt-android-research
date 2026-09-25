@@ -8,6 +8,7 @@ import java.util.UUID;
 public final class Conversation {
     public final String id;
     public final List<Message> messages = new ArrayList<>();
+    public final List<Attachment> attachments = new ArrayList<>();
     public String title;
     public long updatedAt;
 
@@ -26,6 +27,19 @@ public final class Conversation {
         updatedAt = System.currentTimeMillis();
     }
 
+    public synchronized void addAttachment(Attachment attachment) {
+        if (attachment == null) throw new IllegalArgumentException("attachment is null");
+        attachments.add(attachment);
+        updatedAt = System.currentTimeMillis();
+    }
+
+    public synchronized Attachment findAttachment(String attachmentId) {
+        for (Attachment attachment : attachments) {
+            if (attachment.attachmentId.equals(attachmentId)) return attachment;
+        }
+        return null;
+    }
+
     public synchronized Message findMessage(String messageId) {
         for (Message message : messages) {
             if (message.id.equals(messageId)) return message;
@@ -42,6 +56,7 @@ public final class Conversation {
     public synchronized Conversation copy() {
         Conversation copy = new Conversation(id, title, updatedAt);
         for (Message message : messages) copy.messages.add(message.copy());
+        for (Attachment attachment : attachments) copy.attachments.add(attachment.copy());
         return copy;
     }
 }

@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Local Stream Lab</string>
+    <string name="app_name">MoCHi Android</string>
+    <string name="privacy_disclosure">Local conversations and attachment metadata stay on device. Provider credentials are never exported or synced. Cloud sync is staging-only and is not end-to-end encrypted.</string>
 </resources>

@@ -2,6 +2,13 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
+variant="${MOCHI_BUILD_VARIANT:-debug}"
+case "$variant" in
+  debug) version_name="0.11-debug" ;;
+  internal) version_name="0.11-internal" ;;
+  release) echo "Release profile is intentionally gated; this repository only builds debug/internal prototype APKs." >&2; exit 2 ;;
+  *) echo "Unknown MOCHI_BUILD_VARIANT: $variant" >&2; exit 2 ;;
+esac
 sdk="${ANDROID_SDK_ROOT:-/home/mehul/Android/Sdk}"
 build_tools="$sdk/build-tools/36.0.0"
 android_jar="$sdk/platforms/android-37.0/android.jar"
@@ -17,7 +24,7 @@ jar cf "$out/prototype-classes.jar" -C "$out/classes" .
 mapfile -t flat_files < <(find "$out/flat" -name '*.flat' | sort)
 link_args=(link -o "$out/apk/local-stream-lab-unsigned.apk" -I "$android_jar"
     --manifest "$root/src/main/AndroidManifest.xml" --min-sdk-version 32
-    --target-sdk-version 35 --version-code 1 --version-name 0.1-phase5
+    --target-sdk-version 35 --version-code 1 --version-name "$version_name"
     --auto-add-overlay)
 for flat_file in "${flat_files[@]}"; do link_args+=( -R "$flat_file" ); done
 "$build_tools/aapt2" "${link_args[@]}"
