@@ -156,29 +156,36 @@ public final class MainActivity extends Activity implements ConversationCoordina
         addNavigationButton(navigationRow, "Settings", NavigationState.Screen.SETTINGS);
         root.addView(navigationRow, new LinearLayout.LayoutParams(-1, dp(52)));
 
+        ScrollView bodyScroll = new ScrollView(this);
+        bodyScroll.setFillViewport(true);
+        LinearLayout body = new LinearLayout(this);
+        body.setOrientation(LinearLayout.VERTICAL);
+        bodyScroll.addView(body, new ScrollView.LayoutParams(-1, -2));
+        root.addView(bodyScroll, new LinearLayout.LayoutParams(-1, 0, 1));
+
         TextView providerHeading = new TextView(this);
         providerHeading.setText("OpenRouter provider settings");
         providerHeading.setTextSize(16);
         providerHeading.setTextColor(Color.rgb(30, 30, 30));
-        root.addView(providerHeading, new LinearLayout.LayoutParams(-1, dp(34)));
+        body.addView(providerHeading, new LinearLayout.LayoutParams(-1, dp(34)));
 
         endpointInput = new EditText(this);
         endpointInput.setSingleLine(true);
         endpointInput.setHint("Endpoint URL");
         endpointInput.setText(providerSettings.endpoint().toString());
-        root.addView(endpointInput, new LinearLayout.LayoutParams(-1, dp(52)));
+        body.addView(endpointInput, new LinearLayout.LayoutParams(-1, dp(52)));
 
         modelInput = new EditText(this);
         modelInput.setSingleLine(true);
         modelInput.setHint("Model identifier");
         modelInput.setText(providerSettings.modelId());
-        root.addView(modelInput, new LinearLayout.LayoutParams(-1, dp(52)));
+        body.addView(modelInput, new LinearLayout.LayoutParams(-1, dp(52)));
 
         apiKeyInput = new EditText(this);
         apiKeyInput.setSingleLine(true);
         apiKeyInput.setHint("API key (never shown after save)");
         apiKeyInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        root.addView(apiKeyInput, new LinearLayout.LayoutParams(-1, dp(52)));
+        body.addView(apiKeyInput, new LinearLayout.LayoutParams(-1, dp(52)));
 
         LinearLayout providerActions = new LinearLayout(this);
         Button saveProvider = new Button(this);
@@ -199,7 +206,7 @@ public final class MainActivity extends Activity implements ConversationCoordina
             @Override public void onClick(View view) { removeProviderSettings(); }
         });
         providerActions.addView(removeProvider, new LinearLayout.LayoutParams(0, dp(50), 1));
-        root.addView(providerActions, new LinearLayout.LayoutParams(-1, dp(56)));
+        body.addView(providerActions, new LinearLayout.LayoutParams(-1, dp(56)));
 
         providerMode = new Spinner(this);
         String[] providerChoices = BuildProfile.testControlsEnabled()
@@ -208,19 +215,19 @@ public final class MainActivity extends Activity implements ConversationCoordina
         providerMode.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item,
                 providerChoices));
-        root.addView(providerMode, new LinearLayout.LayoutParams(-1, dp(48)));
+        body.addView(providerMode, new LinearLayout.LayoutParams(-1, dp(48)));
 
         TextView syncHeading = new TextView(this);
         syncHeading.setText("Conversation sync mode");
         syncHeading.setTextSize(16);
         syncHeading.setTextColor(Color.rgb(30, 30, 30));
-        root.addView(syncHeading, new LinearLayout.LayoutParams(-1, dp(34)));
+        body.addView(syncHeading, new LinearLayout.LayoutParams(-1, dp(34)));
 
         Spinner syncMode = new Spinner(this);
         syncMode.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item,
                 new String[]{"local-only", "cloud-sync (staging)"}));
-        root.addView(syncMode, new LinearLayout.LayoutParams(-1, dp(48)));
+        body.addView(syncMode, new LinearLayout.LayoutParams(-1, dp(48)));
         Button syncNow = new Button(this);
         syncNow.setText("Sync now");
         syncNow.setOnClickListener(new View.OnClickListener() {
@@ -228,7 +235,7 @@ public final class MainActivity extends Activity implements ConversationCoordina
                 runSync(syncMode.getSelectedItem().toString());
             }
         });
-        root.addView(syncNow, new LinearLayout.LayoutParams(-1, dp(52)));
+        body.addView(syncNow, new LinearLayout.LayoutParams(-1, dp(52)));
 
         scenario = new Spinner(this);
         String[] names = BuildProfile.testControlsEnabled()
@@ -236,19 +243,19 @@ public final class MainActivity extends Activity implements ConversationCoordina
                 "DUPLICATE_TERMINAL", "DELTA_AFTER_TERMINAL", "FAIL_AFTER_TERMINAL"}
                 : new String[]{"NORMAL"};
         scenario.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, names));
-        root.addView(scenario, new LinearLayout.LayoutParams(-1, dp(48)));
+        body.addView(scenario, new LinearLayout.LayoutParams(-1, dp(48)));
 
         TextView privacy = new TextView(this);
         privacy.setText(PrivacyDisclosure.TEXT);
         privacy.setTextSize(12);
         privacy.setTextColor(Color.DKGRAY);
-        root.addView(privacy, new LinearLayout.LayoutParams(-1, dp(54)));
+        body.addView(privacy, new LinearLayout.LayoutParams(-1, dp(54)));
 
         scroll = new ScrollView(this);
         messages = new LinearLayout(this);
         messages.setOrientation(LinearLayout.VERTICAL);
         scroll.addView(messages, new ScrollView.LayoutParams(-1, -2));
-        root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        body.addView(scroll, new LinearLayout.LayoutParams(-1, dp(260)));
 
         LinearLayout composerRow = new LinearLayout(this);
         composerRow.setGravity(Gravity.CENTER_VERTICAL);
