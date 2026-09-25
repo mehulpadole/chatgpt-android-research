@@ -16,6 +16,7 @@ $codecTest = Join-Path $root 'src\test\java\com\example\androidfeasibility\Andro
 if ($LASTEXITCODE -ne 0) { throw "Android codec compatibility test compilation failed" }
 $java = 'C:\Program Files\Android\Android Studio\jbr\bin\java.exe'
 $testClasses = @(
+    'com.example.androidfeasibility.OpenRouterCodecTest',
     'com.example.androidfeasibility.ProviderContractTest',
     'com.example.androidfeasibility.CoordinatorContractTest',
     'com.example.androidfeasibility.ProviderRouterTest',

@@ -21,6 +21,7 @@ javac --release 8 -cp "$out" -d "$out" \
   "$root/src/test/java/com/example/androidfeasibility/AndroidCodecCompatibilityTest.java"
 
 tests=(
+  com.example.androidfeasibility.OpenRouterCodecTest
   com.example.androidfeasibility.ProviderContractTest
   com.example.androidfeasibility.CoordinatorContractTest
   com.example.androidfeasibility.ProviderRouterTest
