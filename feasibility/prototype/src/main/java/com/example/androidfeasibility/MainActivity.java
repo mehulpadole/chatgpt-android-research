@@ -34,6 +34,10 @@ public final class MainActivity extends Activity implements ConversationCoordina
     private AndroidCredentialStore credentialStore;
     private ProviderSettingsController providerSettings;
     private ProviderRouter router;
+    private ProviderRegistry providerRegistry;
+    private NavigationState navigation;
+    private InMemoryProjectRepository projectRepository;
+    private InMemoryMemoryRepository memoryRepository;
     private AndroidAttachmentStore attachmentStore;
     private ComposerDraft composerDraft;
     private SystemTextToSpeechAdapter textToSpeech;
@@ -60,6 +64,9 @@ public final class MainActivity extends Activity implements ConversationCoordina
         providerSettings = new ProviderSettingsController(credentialStore);
         attachmentStore = new AndroidAttachmentStore(this);
         composerDraft = new ComposerDraft();
+        navigation = NavigationState.home();
+        projectRepository = new InMemoryProjectRepository();
+        memoryRepository = new InMemoryMemoryRepository();
         textToSpeech = new SystemTextToSpeechAdapter(this);
         audioCapture = new AndroidAudioCaptureController(this);
         voiceCoordinator = new VoiceSessionCoordinator(audioCapture,
@@ -77,22 +84,38 @@ public final class MainActivity extends Activity implements ConversationCoordina
         } catch (Exception error) {
             syncStore = null;
         }
-        Map<String, ProviderAdapter> adapters = new HashMap<>();
-        adapters.put("local-mock", mockProvider);
+        providerRegistry = new ProviderRegistry();
+        try {
+            providerRegistry.register(new ProviderDefinition("local-mock", "Local deterministic",
+                    new URL("https://local.mochi.invalid/"),
+                    new HashSet<>(java.util.Arrays.asList(ProviderCapabilities.TEXT, ProviderCapabilities.STREAMING))),
+                    mockProvider);
+        } catch (Exception error) {
+            statusSafe("Provider registry unavailable: " + error.getMessage());
+        }
         try {
             httpProvider = new HttpStreamingProviderAdapter(new URL(httpBaseUrl()), "NORMAL");
-            adapters.put("test-http", httpProvider);
+            providerRegistry.register(new ProviderDefinition("test-http", "Local staging HTTP",
+                    new URL(httpBaseUrl()),
+                    new HashSet<>(java.util.Arrays.asList(ProviderCapabilities.TEXT, ProviderCapabilities.STREAMING))),
+                    httpProvider);
         } catch (MalformedURLException error) {
+            httpProvider = null;
+        } catch (IllegalArgumentException error) {
             httpProvider = null;
         }
         try {
             providerSettings.setEndpoint(openRouterBaseUrl());
             openRouterProvider = new OpenRouterProviderAdapter(providerSettings.endpoint(), credentialStore);
-            adapters.put("openrouter", openRouterProvider);
+            providerRegistry.register(new ProviderDefinition("openrouter", "OpenRouter",
+                    providerSettings.endpoint(),
+                    new HashSet<>(java.util.Arrays.asList(ProviderCapabilities.TEXT,
+                            ProviderCapabilities.VISION, ProviderCapabilities.STREAMING))),
+                    openRouterProvider);
         } catch (Exception error) {
             openRouterProvider = null;
         }
-        router = new ProviderRouter(adapters);
+        router = new ProviderRouter(providerRegistry);
         coordinator = new ConversationCoordinator(new JsonConversationRepository(this), router, this,
                 new ProviderConfiguration("local-mock", "deterministic"));
         buildUi();
@@ -111,7 +134,7 @@ public final class MainActivity extends Activity implements ConversationCoordina
         root.setBackgroundColor(Color.rgb(248, 247, 244));
 
         TextView title = new TextView(this);
-        title.setText("Local Stream Lab");
+        title.setText("MoCHi Android");
         title.setTextSize(24);
         title.setTextColor(Color.rgb(30, 30, 30));
         title.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -121,6 +144,14 @@ public final class MainActivity extends Activity implements ConversationCoordina
         status.setText("Idle · local-mock / deterministic");
         status.setTextColor(Color.DKGRAY);
         root.addView(status, new LinearLayout.LayoutParams(-1, dp(32)));
+
+        LinearLayout navigationRow = new LinearLayout(this);
+        navigationRow.setGravity(Gravity.CENTER_HORIZONTAL);
+        addNavigationButton(navigationRow, "Home", NavigationState.Screen.HOME);
+        addNavigationButton(navigationRow, "Projects", NavigationState.Screen.PROJECTS);
+        addNavigationButton(navigationRow, "Memory", NavigationState.Screen.MEMORY);
+        addNavigationButton(navigationRow, "Settings", NavigationState.Screen.SETTINGS);
+        root.addView(navigationRow, new LinearLayout.LayoutParams(-1, dp(52)));
 
         TextView providerHeading = new TextView(this);
         providerHeading.setText("OpenRouter provider settings");
@@ -321,6 +352,30 @@ public final class MainActivity extends Activity implements ConversationCoordina
         providerSettings.removeCredential();
         apiKeyInput.setText("");
         status.setText("OpenRouter credential removed");
+    }
+
+    private void addNavigationButton(LinearLayout row, String label, final NavigationState.Screen screen) {
+        Button button = new Button(this);
+        button.setText(label);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) {
+                navigation = navigationForScreen(screen);
+                status.setText("MoCHi · " + navigation.screen.name());
+            }
+        });
+        row.addView(button, new LinearLayout.LayoutParams(0, dp(50), 1));
+    }
+
+    private NavigationState navigationForScreen(NavigationState.Screen screen) {
+        if (screen == NavigationState.Screen.HOME) return navigation.toHome();
+        if (screen == NavigationState.Screen.PROJECTS) return navigation.toProjects();
+        if (screen == NavigationState.Screen.MEMORY) return navigation.toMemory();
+        if (screen == NavigationState.Screen.SETTINGS) return navigation.toSettings();
+        return navigation;
+    }
+
+    private void statusSafe(String message) {
+        if (status != null) status.setText(message);
     }
 
     private void runSync(String selectedMode) {

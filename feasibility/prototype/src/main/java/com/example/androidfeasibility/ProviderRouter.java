@@ -16,6 +16,10 @@ public final class ProviderRouter implements ProviderAdapter {
         }
     }
 
+    public ProviderRouter(ProviderRegistry registry) {
+        this(registry == null ? null : registry.adapterSnapshot());
+    }
+
     @Override public StreamHandle start(ProviderRequest request, Listener listener) {
         ProviderAdapter adapter = adapters.get(request.providerId);
         if (adapter != null) return adapter.start(request, listener);
