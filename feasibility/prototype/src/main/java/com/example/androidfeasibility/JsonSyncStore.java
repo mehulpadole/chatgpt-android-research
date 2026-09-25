@@ -31,7 +31,8 @@ public final class JsonSyncStore implements SyncOutbox {
     @Override public synchronized List<SyncOperation> pending() {
         List<SyncOperation> result = new ArrayList<>();
         for (SyncOperation operation : operations) {
-            if (operation.state == SyncState.PENDING || operation.state == SyncState.FAILED) result.add(operation);
+            if (operation.state == SyncState.PENDING || operation.state == SyncState.FAILED
+                    || operation.state == SyncState.BLOCKED_QUOTA) result.add(operation);
         }
         return result;
     }
@@ -53,7 +54,8 @@ public final class JsonSyncStore implements SyncOutbox {
     @Override public synchronized SyncCursor cursor() { return new SyncCursor(cursor); }
 
     @Override public synchronized void setCursor(SyncCursor cursor) throws Exception {
-        this.cursor = cursor == null ? 0L : cursor.revision;
+        long candidate = cursor == null ? 0L : cursor.revision;
+        this.cursor = Math.max(this.cursor, candidate);
         persist();
     }
 

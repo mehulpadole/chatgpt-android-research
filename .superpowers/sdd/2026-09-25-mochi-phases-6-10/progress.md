@@ -33,3 +33,5 @@ Task 6: complete (commits d5d9a23..c985835, tests: AttachmentPreparationTest and
 Task 7: complete (commits c985835..b4d8e81, tests: VoiceSessionCoordinatorTest and VoiceContractTest RED→GREEN; run-core-tests.sh → 17 entry points pass; build-prototype.sh → APK/signature pass with Android TTS deprecation note; device audio/realtime explicitly Not tested)
 
 Task 8: complete (commits b4d8e81..pending, tests: SyncContractTest, SyncOutboxTest, SyncConflictTest, and SyncRetryTest RED→GREEN; run-core-tests.sh → 21 entry points pass; Python staging backend syntax and protocol smoke pass for entitlement, cursor changes, idempotent replay, credential rejection, and HTTP 413 quota; Android emulator/device explicitly Not tested)
+
+Task 9: complete (commits 4030af4..pending, focused integration tests RED→GREEN; `SyncWorker`, `AttachmentSyncPolicy`, `SyncHttpTransport`, monotonic cursor, auth-expiry/quota handling, two-device A–E simulation, and Android local-only/cloud-sync selector added; run-core-tests.sh → 23 entry points pass; build-prototype.sh → APK/signature pass; emulator lifecycle/network/background behavior explicitly Not tested)

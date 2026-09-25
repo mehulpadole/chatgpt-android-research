@@ -13,12 +13,33 @@ public final class SyncClient {
     public static final class PushResult {
         public final boolean accepted;
         public final boolean quotaBlocked;
+        public final boolean authExpired;
+        public final boolean retryable;
         public final String error;
 
         public PushResult(boolean accepted, boolean quotaBlocked, String error) {
+            this(accepted, quotaBlocked, false, !accepted && !quotaBlocked, error);
+        }
+
+        public PushResult(boolean accepted, boolean quotaBlocked, boolean authExpired,
+                          boolean retryable, String error) {
             this.accepted = accepted;
             this.quotaBlocked = quotaBlocked;
+            this.authExpired = authExpired;
+            this.retryable = retryable;
             this.error = error == null ? "" : error;
+        }
+
+        public static PushResult accepted() {
+            return new PushResult(true, false, false, false, "");
+        }
+
+        public static PushResult quota(String error) {
+            return new PushResult(false, true, false, false, error);
+        }
+
+        public static PushResult authExpired(String error) {
+            return new PushResult(false, false, true, false, error);
         }
     }
 
@@ -51,11 +72,19 @@ public final class SyncClient {
             }
             if (!pushed.accepted) {
                 for (SyncOperation operation : pending) outbox.markFailed(operation.operationId, pushed.quotaBlocked);
+                if (pushed.authExpired) return SyncStatus.AUTH_EXPIRED;
                 return pushed.quotaBlocked ? SyncStatus.BLOCKED_QUOTA : SyncStatus.FAILED;
             }
             for (SyncOperation operation : pending) outbox.markSucceeded(operation.operationId);
         }
-        ChangeBatch changes = transport.changes(outbox.cursor());
+        ChangeBatch changes;
+        try {
+            changes = transport.changes(outbox.cursor());
+        } catch (SyncTransportException error) {
+            return error.authExpired ? SyncStatus.AUTH_EXPIRED : SyncStatus.FAILED;
+        } catch (Exception error) {
+            return SyncStatus.FAILED;
+        }
         if (changes != null) outbox.setCursor(changes.cursor);
         return SyncStatus.SYNCED;
     }

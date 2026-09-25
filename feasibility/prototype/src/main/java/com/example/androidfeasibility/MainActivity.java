@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -38,6 +39,8 @@ public final class MainActivity extends Activity implements ConversationCoordina
     private SystemTextToSpeechAdapter textToSpeech;
     private AndroidAudioCaptureController audioCapture;
     private VoiceSessionCoordinator voiceCoordinator;
+    private JsonSyncStore syncStore;
+    private SyncWorker activeSyncWorker;
     private Conversation latestConversation;
     private LinearLayout messages;
     private ScrollView scroll;
@@ -69,6 +72,11 @@ public final class MainActivity extends Activity implements ConversationCoordina
                         if (composer != null) composer.setText(transcript);
                     }
                 });
+        try {
+            syncStore = new JsonSyncStore(new File(getFilesDir(), "sync/outbox.properties"));
+        } catch (Exception error) {
+            syncStore = null;
+        }
         Map<String, ProviderAdapter> adapters = new HashMap<>();
         adapters.put("local-mock", mockProvider);
         try {
@@ -164,6 +172,26 @@ public final class MainActivity extends Activity implements ConversationCoordina
                 android.R.layout.simple_spinner_dropdown_item,
                 new String[]{"local-mock", "test-http", "openrouter"}));
         root.addView(providerMode, new LinearLayout.LayoutParams(-1, dp(48)));
+
+        TextView syncHeading = new TextView(this);
+        syncHeading.setText("Conversation sync mode");
+        syncHeading.setTextSize(16);
+        syncHeading.setTextColor(Color.rgb(30, 30, 30));
+        root.addView(syncHeading, new LinearLayout.LayoutParams(-1, dp(34)));
+
+        Spinner syncMode = new Spinner(this);
+        syncMode.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item,
+                new String[]{"local-only", "cloud-sync (staging)"}));
+        root.addView(syncMode, new LinearLayout.LayoutParams(-1, dp(48)));
+        Button syncNow = new Button(this);
+        syncNow.setText("Sync now");
+        syncNow.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) {
+                runSync(syncMode.getSelectedItem().toString());
+            }
+        });
+        root.addView(syncNow, new LinearLayout.LayoutParams(-1, dp(52)));
 
         scenario = new Spinner(this);
         String[] names = new String[]{"NORMAL", "SLOW", "FAIL_BEFORE_CONTENT", "FAIL_AFTER_PARTIAL", "EMPTY",
@@ -295,6 +323,60 @@ public final class MainActivity extends Activity implements ConversationCoordina
         status.setText("OpenRouter credential removed");
     }
 
+    private void runSync(String selectedMode) {
+        if (syncStore == null) {
+            status.setText("Sync unavailable · local store could not open");
+            return;
+        }
+        final boolean cloud = selectedMode != null && selectedMode.startsWith("cloud-sync");
+        final SyncClient.Transport transport;
+        final SyncClient client;
+        try {
+            if (cloud) {
+                String baseUrl = syncBaseUrl();
+                if (baseUrl.isEmpty()) {
+                    status.setText("Cloud sync not configured · inject a staging URL");
+                    return;
+                }
+                transport = new SyncHttpTransport(new URL(baseUrl), null);
+                client = new SyncClient(Entitlement.CLOUD_SYNC);
+            } else {
+                transport = new SyncClient.Transport() {
+                    @Override public SyncClient.PushResult push(List<SyncOperation> operations) {
+                        return SyncClient.PushResult.accepted();
+                    }
+                    @Override public SyncClient.ChangeBatch changes(SyncCursor cursor) {
+                        return new SyncClient.ChangeBatch(cursor, null);
+                    }
+                };
+                client = new SyncClient(Entitlement.LOCAL_ONLY);
+            }
+        } catch (Exception error) {
+            status.setText("Sync configuration invalid: " + error.getMessage());
+            return;
+        }
+        final SyncWorker worker = new SyncWorker(client, syncStore, transport,
+                new SyncWorker.BackoffPolicy(1_000L, 30_000L), null);
+        activeSyncWorker = worker;
+        status.setText(cloud ? "Cloud sync · connecting" : "Local-only · no cloud request");
+        new Thread(new Runnable() {
+            @Override public void run() {
+                final SyncStatus result;
+                try {
+                    result = worker.runUntilTerminal(3);
+                } catch (Exception error) {
+                    runOnUiThread(new Runnable() {
+                        @Override public void run() { status.setText("Sync failed · local data preserved"); }
+                    });
+                    return;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override public void run() { status.setText("Sync · " + result.name()); }
+                });
+            }
+        }, "mochi-sync-worker").start();
+    }
+
     private void applyProviderFields() throws Exception {
         providerSettings.setEndpoint(endpointInput.getText().toString());
         providerSettings.setModel(modelInput.getText().toString());
@@ -377,6 +459,7 @@ public final class MainActivity extends Activity implements ConversationCoordina
     }
 
     @Override protected void onDestroy() {
+        if (activeSyncWorker != null) activeSyncWorker.cancel();
         mockProvider.shutdown();
         if (httpProvider != null) httpProvider.shutdown();
         if (openRouterProvider != null) openRouterProvider.shutdown();
@@ -394,5 +477,10 @@ public final class MainActivity extends Activity implements ConversationCoordina
     private String openRouterBaseUrl() {
         String extra = getIntent().getStringExtra("phase6_openrouter_base_url");
         return extra == null || extra.isEmpty() ? "https://openrouter.ai/" : extra;
+    }
+
+    private String syncBaseUrl() {
+        String extra = getIntent().getStringExtra("phase9_sync_base_url");
+        return extra == null ? "" : extra;
     }
 }
