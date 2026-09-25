@@ -7,11 +7,11 @@ import java.util.concurrent.TimeUnit;
 
 public final class PrototypeCoreTest {
     private static final class ManualProvider implements ProviderAdapter {
+        ProviderRequest request;
         Listener listener;
-        Request request;
         boolean cancelled;
 
-        @Override public StreamHandle start(Request request, Listener listener) {
+        @Override public StreamHandle start(ProviderRequest request, Listener listener) {
             this.request = request;
             this.listener = listener;
             return new StreamHandle() {
@@ -55,7 +55,7 @@ public final class PrototypeCoreTest {
         ManualProvider provider = new ManualProvider();
         RecordingListener listener = new RecordingListener();
         ConversationCoordinator coordinator = coordinator(repo, provider, listener);
-        String turn = coordinator.startTurn("hello", MockScenario.NORMAL);
+        String turn = coordinator.startTurn("hello");
         provider.emit(StreamEvent.started(turn));
         provider.emit(StreamEvent.delta(turn, "first "));
         provider.emit(StreamEvent.delta(turn, "second"));
@@ -74,7 +74,7 @@ public final class PrototypeCoreTest {
         ManualProvider provider = new ManualProvider();
         RecordingListener listener = new RecordingListener();
         ConversationCoordinator coordinator = coordinator(repo, provider, listener);
-        String turn = coordinator.startTurn("cancel me", MockScenario.SLOW);
+        String turn = coordinator.startTurn("cancel me");
         provider.emit(StreamEvent.started(turn));
         coordinator.cancelActive();
         provider.emit(StreamEvent.delta(turn, "late content"));
@@ -90,16 +90,18 @@ public final class PrototypeCoreTest {
         ManualProvider provider = new ManualProvider();
         RecordingListener listener = new RecordingListener();
         ConversationCoordinator coordinator = coordinator(repo, provider, listener);
-        String before = coordinator.startTurn("before", MockScenario.FAIL_BEFORE_CONTENT);
+        String before = coordinator.startTurn("before");
         provider.emit(StreamEvent.started(before));
-        provider.emit(StreamEvent.error(before, "before failure"));
+        provider.emit(StreamEvent.failed(before, new ProviderError(
+                ProviderError.Category.PROVIDER, "before failure", false)));
         check(coordinator.snapshot().messages.get(1).status == MessageStatus.FAILED, "pre-content failure must be visible");
         check(coordinator.snapshot().messages.get(1).content.isEmpty(), "pre-content failure has no fabricated text");
 
-        String after = coordinator.startTurn("after", MockScenario.FAIL_AFTER_PARTIAL);
+        String after = coordinator.startTurn("after");
         provider.emit(StreamEvent.started(after));
         provider.emit(StreamEvent.delta(after, "partial"));
-        provider.emit(StreamEvent.error(after, "after failure"));
+        provider.emit(StreamEvent.failed(after, new ProviderError(
+                ProviderError.Category.PROVIDER, "after failure", false)));
         Message assistant = coordinator.snapshot().messages.get(3);
         check(assistant.status == MessageStatus.FAILED, "partial failure must be visible");
         check(assistant.content.equals("partial"), "partial content must be preserved");
@@ -111,12 +113,12 @@ public final class PrototypeCoreTest {
         ManualProvider provider = new ManualProvider();
         RecordingListener listener = new RecordingListener();
         ConversationCoordinator coordinator = coordinator(repo, provider, listener);
-        String first = coordinator.startTurn("one", MockScenario.NORMAL);
+        String first = coordinator.startTurn("one");
         provider.emit(StreamEvent.started(first));
         provider.emit(StreamEvent.delta(first, "reply one"));
         provider.emit(StreamEvent.completed(first));
         provider.emit(StreamEvent.completed(first));
-        String second = coordinator.startTurn("two", MockScenario.NORMAL);
+        String second = coordinator.startTurn("two");
         provider.emit(StreamEvent.started(second));
         provider.emit(StreamEvent.delta(second, "reply two"));
         provider.emit(StreamEvent.completed(second));
@@ -132,7 +134,7 @@ public final class PrototypeCoreTest {
         ManualProvider provider = new ManualProvider();
         RecordingListener listener = new RecordingListener();
         ConversationCoordinator coordinator = coordinator(repo, provider, listener);
-        String turn = coordinator.startTurn("persist", MockScenario.NORMAL);
+        String turn = coordinator.startTurn("persist");
         provider.emit(StreamEvent.started(turn));
         provider.emit(StreamEvent.delta(turn, "saved reply"));
         provider.emit(StreamEvent.completed(turn));
@@ -146,7 +148,7 @@ public final class PrototypeCoreTest {
 
     private static void testRealDeterministicMockProvider() throws Exception {
         InMemoryConversationRepository repo = new InMemoryConversationRepository();
-        MockProvider provider = new MockProvider();
+        MockProvider provider = new MockProvider(MockScenario.NORMAL);
         final CountDownLatch done = new CountDownLatch(1);
         RecordingListener listener = new RecordingListener() {
             @Override public synchronized void onChanged(Conversation conversation, TurnState state, String error) {
@@ -154,8 +156,8 @@ public final class PrototypeCoreTest {
                 if (state == TurnState.COMPLETED) done.countDown();
             }
         };
-        ConversationCoordinator coordinator = coordinator(repo, provider, listener);
-        coordinator.startTurn("mock", MockScenario.NORMAL);
+        ConversationCoordinator coordinator = new ConversationCoordinator(repo, provider, listener);
+        coordinator.startTurn("mock");
         check(done.await(5, TimeUnit.SECONDS), "deterministic mock must complete");
         check(coordinator.snapshot().messages.get(1).content.contains("mock"), "mock must emit content");
         provider.shutdown();

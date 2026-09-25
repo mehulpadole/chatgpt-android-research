@@ -33,7 +33,7 @@ $manifest = Join-Path $root 'src\main\AndroidManifest.xml'
 $flatFiles = Get-ChildItem -LiteralPath $flat -Filter '*.flat' | Select-Object -ExpandProperty FullName
 $linkArgs = @('-o', $unsigned, '-I', $androidJar, '--manifest', $manifest,
     '--min-sdk-version', '32', '--target-sdk-version', '35', '--version-code', '1',
-    '--version-name', '0.1-phase4', '--auto-add-overlay')
+    '--version-name', '0.1-phase5', '--auto-add-overlay')
 foreach ($flatFile in $flatFiles) { $linkArgs += @('-R', $flatFile) }
 & $aapt2 link @linkArgs
 if ($LASTEXITCODE -ne 0) { throw "aapt2 link failed with exit code $LASTEXITCODE" }

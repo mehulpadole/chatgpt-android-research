@@ -1,10 +1,14 @@
 package com.example.androidfeasibility;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public final class ConversationCoordinator {
+    /** Persist a streaming snapshot after this many new content characters. */
+    public static final int DELTA_CHECKPOINT_CHAR_THRESHOLD = 16;
+
     public interface Listener {
         void onChanged(Conversation conversation, TurnState state, String error);
     }
@@ -12,12 +16,13 @@ public final class ConversationCoordinator {
     private static final class TurnRuntime {
         final String turnId;
         final String assistantMessageId;
-        final ProviderAdapter.Request request;
+        final ProviderRequest request;
         ProviderAdapter.StreamHandle handle;
         TurnState state = TurnState.STARTING;
         boolean terminal;
+        int lastPersistedContentLength;
 
-        TurnRuntime(String turnId, String assistantMessageId, ProviderAdapter.Request request) {
+        TurnRuntime(String turnId, String assistantMessageId, ProviderRequest request) {
             this.turnId = turnId;
             this.assistantMessageId = assistantMessageId;
             this.request = request;
@@ -27,6 +32,7 @@ public final class ConversationCoordinator {
     private final ConversationRepository repository;
     private final ProviderAdapter provider;
     private final Listener listener;
+    private ProviderConfiguration providerConfiguration;
     private final Map<String, TurnRuntime> turns = new HashMap<>();
     private Conversation conversation;
     private String activeTurnId;
@@ -34,19 +40,33 @@ public final class ConversationCoordinator {
 
     public ConversationCoordinator(ConversationRepository repository,
                                    ProviderAdapter provider, Listener listener) {
+        this(repository, provider, listener,
+                new ProviderConfiguration("local-mock", "deterministic"));
+    }
+
+    public ConversationCoordinator(ConversationRepository repository,
+                                   ProviderAdapter provider, Listener listener,
+                                   ProviderConfiguration providerConfiguration) {
         this.repository = repository;
         this.provider = provider;
         this.listener = listener;
+        this.providerConfiguration = providerConfiguration;
         this.conversation = Conversation.empty();
     }
 
     public synchronized Conversation restore() throws Exception {
         Conversation loaded = repository.load();
         if (loaded != null) conversation = loaded;
+        boolean repaired = false;
         for (Message message : conversation.messages) {
-            if (message.status == MessageStatus.STREAMING) message.status = MessageStatus.FAILED;
+            if (message.status == MessageStatus.STREAMING) {
+                message.status = MessageStatus.FAILED;
+                message.failureCategory = ProviderError.Category.UNKNOWN.name();
+                message.failureMessage = "interrupted by process termination";
+                repaired = true;
+            }
         }
-        repository.save(conversation);
+        if (repaired || loaded == null) repository.save(conversation);
         notifyChanged(TurnState.IDLE, "");
         return conversation.copy();
     }
@@ -61,7 +81,20 @@ public final class ConversationCoordinator {
         return runtime == null ? TurnState.IDLE : runtime.state;
     }
 
-    public synchronized String startTurn(String prompt, MockScenario scenario) throws Exception {
+    public synchronized ProviderConfiguration providerConfiguration() {
+        return providerConfiguration;
+    }
+
+    public synchronized void setProviderConfiguration(ProviderConfiguration providerConfiguration) {
+        TurnState current = state();
+        if (current == TurnState.STARTING || current == TurnState.STREAMING) {
+            throw new IllegalStateException("cannot change provider during an active turn");
+        }
+        if (providerConfiguration == null) throw new IllegalArgumentException("provider configuration is null");
+        this.providerConfiguration = providerConfiguration;
+    }
+
+    public synchronized String startTurn(String prompt) throws Exception {
         if (prompt == null || prompt.trim().isEmpty()) throw new IllegalArgumentException("prompt is empty");
         TurnState current = state();
         if (current == TurnState.STARTING || current == TurnState.STREAMING) {
@@ -71,50 +104,71 @@ public final class ConversationCoordinator {
         final String userId = UUID.randomUUID().toString();
         final String assistantId = UUID.randomUUID().toString();
         Message user = new Message(userId, conversation.id, turnId, Role.USER,
-                prompt, MessageStatus.COMPLETED, "local-mock", "deterministic", System.currentTimeMillis());
-        Message assistant = new Message(assistantId, conversation.id, turnId, Role.ASSISTANT,
-                "", MessageStatus.STREAMING, "local-mock", "deterministic", System.currentTimeMillis());
+                prompt, MessageStatus.COMPLETED, providerConfiguration.providerId,
+                providerConfiguration.modelId, System.currentTimeMillis());
+        Message assistant = new Message(assistantId, conversation.id, turnId,
+                Role.ASSISTANT, "", MessageStatus.STREAMING,
+                providerConfiguration.providerId, providerConfiguration.modelId,
+                System.currentTimeMillis());
         if (conversation.messages.isEmpty()) {
             conversation.title = prompt.length() > 32 ? prompt.substring(0, 32) : prompt;
         }
         conversation.add(user);
         conversation.add(assistant);
-        final ProviderAdapter.Request request = new ProviderAdapter.Request(
-                conversation.id, turnId, prompt, scenario, "local-mock", "deterministic");
+        final ProviderRequest request = new ProviderRequest(
+                conversation.id, turnId, userId, assistantId, prompt,
+                providerConfiguration.providerId, providerConfiguration.modelId,
+                Collections.<String, String>emptyMap());
         final TurnRuntime runtime = new TurnRuntime(turnId, assistantId, request);
         turns.put(turnId, runtime);
         activeTurnId = turnId;
         lastError = "";
         repository.save(conversation);
         notifyChanged(TurnState.STARTING, "");
-        runtime.handle = provider.start(request, new ProviderAdapter.Listener() {
-            @Override public void onEvent(StreamEvent event) {
-                apply(event);
-            }
-        });
+        try {
+            runtime.handle = provider.start(request, new ProviderAdapter.Listener() {
+                @Override public void onEvent(StreamEvent event) {
+                    apply(event);
+                }
+            });
+        } catch (Exception error) {
+            apply(StreamEvent.failed(turnId, new ProviderError(
+                    ProviderError.Category.PROVIDER, error.getMessage(), false)));
+        }
         return turnId;
     }
 
     public synchronized void cancelActive() throws Exception {
         if (activeTurnId == null) return;
-        TurnRuntime runtime = turns.get(activeTurnId);
+        cancel(activeTurnId);
+    }
+
+    public synchronized void cancel(String turnId) throws Exception {
+        if (turnId == null) return;
+        TurnRuntime runtime = turns.get(turnId);
         if (runtime == null || runtime.terminal) return;
         runtime.terminal = true;
         runtime.state = TurnState.CANCELLED;
         if (runtime.handle != null) runtime.handle.cancel();
         Message assistant = conversation.findMessage(runtime.assistantMessageId);
-        if (assistant != null) assistant.status = MessageStatus.CANCELLED;
-        activeTurnId = null;
-        repository.save(conversation);
+        if (assistant != null) {
+            assistant.status = MessageStatus.CANCELLED;
+            assistant.failureCategory = ProviderError.Category.CANCELLED.name();
+            assistant.failureMessage = "cancelled";
+        }
+        if (turnId.equals(activeTurnId)) activeTurnId = null;
+        persist(runtime);
         notifyChanged(TurnState.CANCELLED, "");
     }
 
     private void apply(StreamEvent event) {
+        if (event == null || event.turnId == null) return;
         synchronized (this) {
             TurnRuntime runtime = turns.get(event.turnId);
             if (runtime == null || runtime.terminal) return;
             Message assistant = conversation.findMessage(runtime.assistantMessageId);
-            if (assistant == null) return;
+            if (assistant == null || !assistant.turnId.equals(event.turnId)) return;
+            boolean checkpoint = false;
             switch (event.type) {
                 case STARTED:
                     runtime.state = TurnState.STREAMING;
@@ -123,35 +177,66 @@ public final class ConversationCoordinator {
                 case DELTA:
                     if (runtime.state == TurnState.STARTING) runtime.state = TurnState.STREAMING;
                     if (runtime.state != TurnState.STREAMING) return;
-                    assistant.content = assistant.content + event.text;
+                    String delta = event.text == null ? "" : event.text;
+                    assistant.content = assistant.content + delta;
                     assistant.status = MessageStatus.STREAMING;
+                    checkpoint = assistant.content.length() - runtime.lastPersistedContentLength
+                            >= DELTA_CHECKPOINT_CHAR_THRESHOLD;
                     break;
                 case COMPLETED:
-                    if (runtime.terminal) return;
                     runtime.terminal = true;
                     runtime.state = TurnState.COMPLETED;
                     assistant.status = MessageStatus.COMPLETED;
-                    activeTurnId = null;
+                    clearFailure(assistant);
+                    if (event.turnId.equals(activeTurnId)) activeTurnId = null;
+                    checkpoint = true;
                     break;
-                case ERROR:
-                    if (runtime.terminal) return;
+                case FAILED:
                     runtime.terminal = true;
                     runtime.state = TurnState.FAILED;
                     assistant.status = MessageStatus.FAILED;
-                    lastError = event.error == null ? "mock provider failure" : event.error;
-                    activeTurnId = null;
+                    ProviderError failure = event.error == null ? new ProviderError(
+                            ProviderError.Category.UNKNOWN, "provider failure", false) : event.error;
+                    assistant.failureCategory = failure.category.name();
+                    assistant.failureMessage = failure.message;
+                    lastError = failure.message;
+                    if (event.turnId.equals(activeTurnId)) activeTurnId = null;
+                    checkpoint = true;
                     break;
+                case CANCELLED:
+                    runtime.terminal = true;
+                    runtime.state = TurnState.CANCELLED;
+                    assistant.status = MessageStatus.CANCELLED;
+                    assistant.failureCategory = ProviderError.Category.CANCELLED.name();
+                    assistant.failureMessage = event.error == null ? "cancelled" : event.error.message;
+                    if (event.turnId.equals(activeTurnId)) activeTurnId = null;
+                    checkpoint = true;
+                    break;
+                default:
+                    return;
             }
-            try {
-                repository.save(conversation);
-            } catch (Exception error) {
-                lastError = "persistence error: " + error.getMessage();
-            }
+            if (checkpoint) persist(runtime);
             notifyChanged(runtime.state, lastError);
         }
     }
 
+    private void persist(TurnRuntime runtime) {
+        Message assistant = conversation.findMessage(runtime.assistantMessageId);
+        if (assistant != null) runtime.lastPersistedContentLength = assistant.content.length();
+        try {
+            repository.save(conversation);
+        } catch (Exception error) {
+            lastError = "persistence error: " + error.getMessage();
+        }
+    }
+
+    private void clearFailure(Message message) {
+        message.failureCategory = "";
+        message.failureMessage = "";
+        lastError = "";
+    }
+
     private void notifyChanged(TurnState state, String error) {
-        if (listener != null) listener.onChanged(conversation.copy(), state, error);
+        if (listener != null) listener.onChanged(conversation.copy(), state, error == null ? "" : error);
     }
 }

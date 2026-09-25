@@ -22,6 +22,8 @@ public final class AndroidConversationCodec {
             item.put("status", message.status.name());
             item.put("provider", message.provider);
             item.put("model", message.model);
+            item.put("failureCategory", message.failureCategory);
+            item.put("failureMessage", message.failureMessage);
             item.put("createdAt", message.createdAt);
             messages.put(item);
         }
@@ -43,7 +45,9 @@ public final class AndroidConversationCodec {
                         item.optString("content", ""),
                         MessageStatus.valueOf(item.getString("status")),
                         item.optString("provider", ""), item.optString("model", ""),
-                        item.optLong("createdAt", System.currentTimeMillis())));
+                        item.optLong("createdAt", System.currentTimeMillis()),
+                        item.optString("failureCategory", ""),
+                        item.optString("failureMessage", "")));
             }
         }
         return conversation;

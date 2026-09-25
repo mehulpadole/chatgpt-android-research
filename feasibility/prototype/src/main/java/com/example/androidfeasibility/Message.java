@@ -10,10 +10,20 @@ public final class Message {
     public MessageStatus status;
     public String provider;
     public String model;
+    public String failureCategory;
+    public String failureMessage;
 
     public Message(String id, String conversationId, String turnId, Role role,
                    String content, MessageStatus status, String provider,
                    String model, long createdAt) {
+        this(id, conversationId, turnId, role, content, status, provider, model,
+                createdAt, "", "");
+    }
+
+    public Message(String id, String conversationId, String turnId, Role role,
+                   String content, MessageStatus status, String provider,
+                   String model, long createdAt, String failureCategory,
+                   String failureMessage) {
         this.id = id;
         this.conversationId = conversationId;
         this.turnId = turnId;
@@ -23,10 +33,12 @@ public final class Message {
         this.provider = provider;
         this.model = model;
         this.createdAt = createdAt;
+        this.failureCategory = failureCategory == null ? "" : failureCategory;
+        this.failureMessage = failureMessage == null ? "" : failureMessage;
     }
 
     public Message copy() {
         return new Message(id, conversationId, turnId, role, content, status,
-                provider, model, createdAt);
+                provider, model, createdAt, failureCategory, failureMessage);
     }
 }
